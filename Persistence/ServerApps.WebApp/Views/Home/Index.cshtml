@@ -1,0 +1,45 @@
+﻿@model Tuple<Dictionary<string, List<ServerApps.Business.Dtos.GetServerAppDto>>, Dictionary<string, string>>
+
+@{
+    ViewData["Title"] = "IIS Uygulamaları";
+}
+
+<h2 class="mb-4">IIS Uygulamaları</h2>
+
+@if (Model.Item1 == null || !Model.Item1.Any())
+{
+    <div class="alert alert-warning">Hiçbir uygulama bulunamadı.</div>
+}
+else
+{
+    @foreach (var ipAddress in Model.Item1.Keys)
+    {
+        string serverName = Model.Item2.ContainsKey(ipAddress) ? Model.Item2[ipAddress] : "Bilinmeyen Sunucu";
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>Sunucu: @serverName (@ipAddress)</strong>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Uygulama Adı</th>
+                            <th>Port</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var app in Model.Item1[ipAddress])
+                        {
+                            <tr>
+                                <td>@app.ApplicationName</td>
+                                <td>@app.Port</td>
+                                <td>@app.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
