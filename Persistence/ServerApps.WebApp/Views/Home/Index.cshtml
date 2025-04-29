@@ -1,4 +1,4 @@
-﻿@model Tuple<Dictionary<string, List<ServerApps.Business.Dtos.GetServerAppDto>>, Dictionary<string, string>>
+﻿@model Tuple<List<ServerApps.WebApp.ViewModels.ServerAppViewModel>, int, int>
 
 @{
     ViewData["Title"] = "IIS Uygulamaları";
@@ -12,34 +12,88 @@
 }
 else
 {
-    @foreach (var ipAddress in Model.Item1.Keys)
-    {
-        string serverName = Model.Item2.ContainsKey(ipAddress) ? Model.Item2[ipAddress] : "Bilinmeyen Sunucu";
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>Sunucu: @serverName (@ipAddress)</strong>
-            </div>
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Uygulama Adı</th>
-                            <th>Port</th>
-                            <th>Durum</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var app in Model.Item1[ipAddress])
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @* <th>Sunucu Adı</th> *@
+                <th>IP</th>
+                <th>Uygulama Adı</th>
+                <th>Port</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model.Item1)
+            {
+                <tr>
+                    @* <td>@app.ServerName</td> *@
+                    <td>@app.Ip</td>
+                    <td>@app.ApplicationName</td>
+                    <td>@app.Port</td>
+                    <td>
+                        @if (app.Status?.ToLower() == "started")
                         {
-                            <tr>
-                                <td>@app.ApplicationName</td>
-                                <td>@app.Port</td>
-                                <td>@app.Status</td>
-                            </tr>
+                            <span style="color: green;">✔️</span>
                         }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
+                        else if (app.Status?.ToLower() == "stopped")
+                        {
+                            <span style="color: red;">❌</span>
+                        }
+                        else
+                        {
+                            @app.Status
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Sabit Sayfalama -->
+    <div class="d-flex justify-content-center mt-4 fixed-pagination">
+        <nav>
+            <ul class="pagination">
+                @if (Model.Item2 > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Item2 - 1 })" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item disabled">
+                    <span class="page-link">Sayfa @Model.Item2 / @Model.Item3</span>
+                </li>
+
+                @if (Model.Item2 < Model.Item3)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Item2 + 1 })" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
 }
+
+<!-- CSS Stili -->
+<style>
+    .fixed-pagination {
+        position: fixed;
+        bottom: 20px; /* Sayfa altından 20px yukarıda */
+        left: 50%;
+        transform: translateX(-50%); /* Ortalamak için */
+        z-index: 999; /* Üstte görünmesi için */
+        width: 100%;
+        padding: 10px 0;
+        background-color: #fff; /* Arka plan rengi beyaz */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Gölgelendirme */
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+</style>

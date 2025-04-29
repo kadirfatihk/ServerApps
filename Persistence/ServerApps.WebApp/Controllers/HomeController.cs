@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using ServerApps.Business.Dtos;
 using ServerApps.Business.Usescasess.Configuration;
 using ServerApps.Business.Usescasess.IIS;
-using System.Net.Http;
+using ServerApps.WebApp.ViewModels;
+using System.Collections.Generic;
+using System.Linq;
 
 public class HomeController : Controller
 {
@@ -15,52 +17,37 @@ public class HomeController : Controller
         _configurationService = configurationService;
     }
 
-    //public IActionResult Index()
-    //{
-    //    List<GetServerAppDto> applications = _iisService.GetAllApplications();
-    //    return View(applications);
-    //}
-
-    //public IActionResult Index()
-    //{
-    //    List<GetServerAppDto> applications = _iisService.GetAllApplications();
-
-    //    // IP adresine göre gruplandýrma
-    //    Dictionary<string, List<GetServerAppDto>> groupedApplications = applications
-    //        .GroupBy(app => app.Ip)
-    //        .ToDictionary(
-    //            group => group.Key,
-    //            group => group.ToList()
-    //        );
-
-    //    return View(groupedApplications);
-    //}
-
-    public IActionResult Index()
+    // Sayfalama için parametre alacaðýz
+    public IActionResult Index(int page = 1) // Varsayýlan olarak 1. sayfa gösterilecek
     {
-        List<GetServerAppDto> applications = _iisService.GetAllApplications();
+        int pageSize = 10; // Her sayfada 10 öðe gösterilecek
 
-        // IP ve isimleri bir sözlükte sakla
-        Dictionary<string, string> serverNames = new Dictionary<string, string>();
+        var applications = _iisService.GetAllApplications();
         var configurations = _configurationService.GetConfigurations();
-        foreach (var config in configurations)
+
+        var serverNames = configurations
+            .GroupBy(x => x.Ip)
+            .ToDictionary(x => x.Key, x => x.First().Name);
+
+        // Uygulamalarý view model'e dönüþtürüyoruz
+        var viewModels = applications.Select(app => new ServerAppViewModel
         {
-            if (!serverNames.ContainsKey(config.Ip))
-            {
-                serverNames[config.Ip] = config.Name;
-            }
-        }
+            ApplicationName = app.ApplicationName,
+            Ip = app.Ip,
+            Port = app.Port,
+            Status = app.Status,
+            //ServerName = serverNames.ContainsKey(app.Ip) ? serverNames[app.Ip] : "Bilinmeyen"
+        }).ToList();
 
-        // IP adresine göre gruplandýrma
-        Dictionary<string, List<GetServerAppDto>> groupedApplications = applications
-            .GroupBy(app => app.Ip)
-            .ToDictionary(
-                group => group.Key,
-                group => group.ToList()
-            );
+        // Sayfalama: veriyi belirtilen sayfaya göre bölüyoruz
+        var pagedItems = viewModels.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-        // View'a göndermek için bir model oluþtur.
-        var viewModel = new Tuple<Dictionary<string, List<GetServerAppDto>>, Dictionary<string, string>>(groupedApplications, serverNames);
-        return View(viewModel);
+        // Sayfa sayýsý hesaplama
+        var totalPages = (int)Math.Ceiling(viewModels.Count / (double)pageSize);
+
+        // Modelde sayfalama bilgilerini de gönderiyoruz
+        var model = new Tuple<List<ServerAppViewModel>, int, int>(pagedItems, page, totalPages);
+
+        return View(model);
     }
 }
