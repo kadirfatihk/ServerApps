@@ -1,0 +1,107 @@
+﻿@model Tuple<List<ServerApps.WebApp.ViewModels.ServerAppViewModel>, int, int>
+
+@{
+    ViewData["Title"] = "IIS Uygulamaları";
+}
+
+<h2 class="mb-4">IIS Uygulamaları</h2>
+
+<!-- Arama Kutusu -->
+<form method="get" asp-controller="WebSite" asp-action="WebSite" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchIp" class="form-control" placeholder="IP adresine göre ara" value="@ViewBag.SearchIp" />
+        <button type="submit" class="btn btn-primary">Ara</button>
+    </div>
+</form>
+
+@if (Model.Item1 == null || !Model.Item1.Any())
+{
+    <div class="alert alert-warning">Hiçbir uygulama bulunamadı.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @* <th>Sunucu Adı</th> *@
+                <th>IP</th>
+                <th>Uygulama Adı</th>
+                <th>Port</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var app in Model.Item1)
+            {
+                <tr>
+                    @* <td>@app.ServerName</td> *@
+                    <td>@app.Ip</td>
+                    <td>@app.ApplicationName</td>
+                    <td>@app.Port</td>
+                    <td>
+                        @if (app.Status?.ToLower() == "started")
+                        {
+                            <span style="color: green;">✔️</span>
+                        }
+                        else if (app.Status?.ToLower() == "stopped")
+                        {
+                            <span style="color: red;">❌</span>
+                        }
+                        else
+                        {
+                            @app.Status
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Sabit Sayfalama -->
+    <div class="d-flex justify-content-center mt-4 fixed-pagination">
+        <nav>
+            <ul class="pagination">
+                @if (Model.Item2 > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("WebSite", new { page = Model.Item2 - 1, searchIp = ViewBag.SearchIp })" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item disabled">
+                    <span class="page-link">Sayfa @Model.Item2 / @Model.Item3</span>
+                </li>
+
+                @if (Model.Item2 < Model.Item3)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("WebSite", new { page = Model.Item2 + 1, searchIp = ViewBag.SearchIp })" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+<!-- CSS Stili -->
+<style>
+    .fixed-pagination {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+</style>

@@ -17,11 +17,12 @@
 
   <ItemGroup>
     <PackageReference Include="Cake.Powershell" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNet.WebPages.Administration" Version="2.0.30506" />
+    <!--<PackageReference Include="Microsoft.AspNet.WebPages.Administration" Version="2.0.30506" />-->
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
     <PackageReference Include="System.Management.Automation" Version="7.4.7" />
+    <PackageReference Include="TaskScheduler" Version="2.12.1" />
   </ItemGroup>
 
 </Project>

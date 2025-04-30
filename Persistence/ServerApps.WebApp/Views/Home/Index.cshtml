@@ -1,99 +1,15 @@
-﻿@model Tuple<List<ServerApps.WebApp.ViewModels.ServerAppViewModel>, int, int>
-
-@{
-    ViewData["Title"] = "IIS Uygulamaları";
+﻿@{
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<h2 class="mb-4">IIS Uygulamaları</h2>
-
-@if (Model.Item1 == null || !Model.Item1.Any())
-{
-    <div class="alert alert-warning">Hiçbir uygulama bulunamadı.</div>
-}
-else
-{
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                @* <th>Sunucu Adı</th> *@
-                <th>IP</th>
-                <th>Uygulama Adı</th>
-                <th>Port</th>
-                <th>Durum</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var app in Model.Item1)
-            {
-                <tr>
-                    @* <td>@app.ServerName</td> *@
-                    <td>@app.Ip</td>
-                    <td>@app.ApplicationName</td>
-                    <td>@app.Port</td>
-                    <td>
-                        @if (app.Status?.ToLower() == "started")
-                        {
-                            <span style="color: green;">✔️</span>
-                        }
-                        else if (app.Status?.ToLower() == "stopped")
-                        {
-                            <span style="color: red;">❌</span>
-                        }
-                        else
-                        {
-                            @app.Status
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <!-- Sabit Sayfalama -->
-    <div class="d-flex justify-content-center mt-4 fixed-pagination">
-        <nav>
-            <ul class="pagination">
-                @if (Model.Item2 > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Item2 - 1 })" aria-label="Önceki">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                }
-
-                <li class="page-item disabled">
-                    <span class="page-link">Sayfa @Model.Item2 / @Model.Item3</span>
-                </li>
-
-                @if (Model.Item2 < Model.Item3)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("Index", new { page = Model.Item2 + 1 })" aria-label="Sonraki">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="text-center">
+        <h2>İşlem Seçin</h2>
+        <div class="mt-4">
+            <!-- Web Siteleri Butonu -->
+            <a asp-action="WebSite" asp-controller="WebSite" class="btn btn-primary btn-lg mx-2">Web Siteleri</a>
+            <!-- Test Uygulamaları Butonu -->
+            <a asp-action="GetTestApps" asp-controller="Home" class="btn btn-secondary btn-lg mx-2">Test Uygulamaları</a>
+        </div>
     </div>
-}
-
-<!-- CSS Stili -->
-<style>
-    .fixed-pagination {
-        position: fixed;
-        bottom: 20px; /* Sayfa altından 20px yukarıda */
-        left: 50%;
-        transform: translateX(-50%); /* Ortalamak için */
-        z-index: 999; /* Üstte görünmesi için */
-        width: 100%;
-        padding: 10px 0;
-        background-color: #fff; /* Arka plan rengi beyaz */
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Gölgelendirme */
-    }
-
-    .pagination {
-        margin-bottom: 0;
-    }
-</style>
+</div>

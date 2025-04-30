@@ -1,13 +1,14 @@
 ﻿using Microsoft.Web.Administration;
+using Microsoft.Win32.TaskScheduler; // TaskScheduler API'si
 using ServerApps.Business.Dtos;
 using ServerApps.Business.Usescasess.Configuration;
 using ServerApps.Business.Usescasess.IIS;
-using ServerApps.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
-using System;
+using System.Threading.Tasks;
 
 public class IisService : IIisService
 {
@@ -50,7 +51,7 @@ public class IisService : IIisService
                 {
                     // Uzak sunucu için PowerShell ile bağlan
 
-                    // Şifre secure string'e çevrilir
+                    // Şifre secure string’e çevrilir
                     var securePwd = new System.Security.SecureString();
                     foreach (char c in config.Password)
                         securePwd.AppendChar(c);
@@ -119,9 +120,6 @@ public class IisService : IIisService
                             bindingsList.Add(bindingsValue.ToString());
                         }
 
-                        // Eski hali:
-                        // var port = bindings.FirstOrDefault()?.ToString().Split(':')[1]; // Bu hali patlamaya açıktı
-
                         // DEĞİŞTİRİLDİ: Binding string'inden güvenli şekilde port çıkarıldı
                         int port = 0;
                         var firstBinding = bindingsList.FirstOrDefault();
@@ -153,7 +151,7 @@ public class IisService : IIisService
                     ApplicationName = "ERROR",
                     Ip = config.Ip,
                     Port = 0,
-                    Status = $"Bağlantı hatası: {ex.Message}" // DEĞİŞTİRİLDİ: Daha açıklayıcı hata mesajı
+                    Status = $"Bağlantı hatası: {ex.Message}" // Daha açıklayıcı hata mesajı
                 });
             }
         }
