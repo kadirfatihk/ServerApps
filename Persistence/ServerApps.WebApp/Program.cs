@@ -1,6 +1,7 @@
 using ServerApps.Business.Configuration;
 using ServerApps.Business.Usescasess.Configuration;
 using ServerApps.Business.Usescasess.IIS;
+using ServerApps.Business.Usescasess.Task;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddHttpClient(); // HttpClient servisi eklendi
 
 builder.Services.AddScoped<IIisService, IisService>(); // IIisService servisi eklendi
 builder.Services.AddScoped<IConfigurationService, ConfigurationService>(); // IConfigurationService servisi eklendi
+builder.Services.AddScoped<ITaskService, TaskService>(); // ITaskService servisi eklendi
 
 var app = builder.Build();
 

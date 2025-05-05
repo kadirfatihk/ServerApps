@@ -1,0 +1,111 @@
+﻿@model Tuple<List<ServerApps.Business.Dtos.TaskInfoApplicationDto>, int, int>
+
+@{
+    ViewData["Title"] = "Web Sitesi Görevleri";
+}
+
+<h2 class="mb-4">Web Sitesi Görevleri</h2>
+
+<!-- Arama Kutusu -->
+<form method="get" asp-controller="Task" asp-action="GetTask" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchIp" class="form-control" placeholder="IP adresine göre ara" value="@ViewBag.SearchIp" />
+        <button type="submit" class="btn btn-primary">Ara</button>
+    </div>
+</form>
+
+@if (Model.Item1 == null || !Model.Item1.Any())
+{
+    <div class="alert alert-warning">Hiçbir görev bulunamadı.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Uygulama Adı</th>
+                <th>IP Adresi</th>
+                <th>Görev Adı</th>
+                <th>Durum</th>
+                <th>Tetikleyici</th>
+                <th>Son Çalıştırma Zamanı</th>
+                <th>Sonuç</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model.Item1)
+            {
+                <tr>
+                    <td>@task.ApplicationName</td>
+                    <td>@task.Ip</td>
+                    <td>@task.TaskName</td>
+                    <td>
+                        @if (task.Status?.ToLower() == "started")
+                        {
+                            <span style="color: green;">✔️</span>
+                        }
+                        else if (task.Status?.ToLower() == "stopped")
+                        {
+                            <span style="color: red;">❌</span>
+                        }
+                        else
+                        {
+                            @task.Status
+                        }
+                    </td>
+                    <td>@task.Trigger</td>
+                    <td>@task.LastRunTime.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@task.LastTaskResult</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Sabit Sayfalama -->
+    <div class="d-flex justify-content-center mt-4 fixed-pagination">
+        <nav>
+            <ul class="pagination">
+                @if (Model.Item2 > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 - 1, searchIp = ViewBag.SearchIp })" aria-label="Önceki">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                <li class="page-item disabled">
+                    <span class="page-link">Sayfa @Model.Item2 / @Model.Item3</span>
+                </li>
+
+                @if (Model.Item2 < Model.Item3)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 + 1, searchIp = ViewBag.SearchIp })" aria-label="Sonraki">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+<!-- CSS Stili -->
+<style>
+    .fixed-pagination {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        width: 100%;
+        padding: 10px 0;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+</style>
