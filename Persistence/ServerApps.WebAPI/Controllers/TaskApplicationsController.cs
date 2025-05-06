@@ -20,7 +20,7 @@ namespace ServerApps.Controllers
         [HttpGet("tasks")]
         public ActionResult<List<TaskInfoApplicationDto>> GetTasks()
         {
-            var tasks = _taskService.GetAllTasksFromWebSites();
+            var tasks = _taskService.GetAllTasks();
             return Ok(tasks);
         }
     }

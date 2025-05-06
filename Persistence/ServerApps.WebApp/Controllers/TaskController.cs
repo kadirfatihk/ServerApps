@@ -2,6 +2,7 @@
 using ServerApps.Business.Dtos;
 using ServerApps.Business.Usescasess.Task;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ServerApps.WebApp.Controllers
 {
@@ -9,37 +10,38 @@ namespace ServerApps.WebApp.Controllers
     {
         private readonly ITaskService _taskService;
 
-        // Constructor injection ile TaskService'i alıyoruz
         public TaskController(ITaskService taskService)
         {
             _taskService = taskService;
         }
 
-        // GET: /Task/GetTask
-        public IActionResult GetTask(string searchIp, int page = 1)
+        public IActionResult GetTask(string searchQuery, int page = 1)
         {
-            // Varsayılan değerler
-            int pageSize = 10; // Sayfa başına görev sayısı
-            int totalTasks = 0;
+            int pageSize = 10;
 
-            // Tüm görevleri al
-            List<TaskInfoApplicationDto> allTasks = _taskService.GetAllTasksFromWebSites();
+            List<TaskInfoApplicationDto> allTasks = _taskService.GetAllTasks();
 
-            // IP adresine göre arama yapılacaksa filtreleme
-            if (!string.IsNullOrEmpty(searchIp))
+            if (!string.IsNullOrEmpty(searchQuery))
             {
-                allTasks = allTasks.FindAll(task => task.Ip.Contains(searchIp));
+                allTasks = allTasks.Where(task =>
+                    (task.ApplicationName != null && task.ApplicationName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.Ip != null && task.Ip.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.TaskName != null && task.TaskName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.Status != null && task.Status.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.Trigger != null && task.Trigger.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.LastTaskResult != null && task.LastTaskResult.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (task.LastRunTime.HasValue && task.LastRunTime.Value.ToString("dd.MM.yyyy HH:mm").Contains(searchQuery)) ||
+                    (task.NextRunTime.HasValue && task.NextRunTime.Value.ToString("dd.MM.yyyy HH:mm").Contains(searchQuery))
+                ).ToList();
             }
 
-            // Sayfalama işlemleri
-            int totalPages = (int)Math.Ceiling(allTasks.Count / (double)pageSize);
+            int totalTasks = allTasks.Count;
+            int totalPages = (int)Math.Ceiling(totalTasks / (double)pageSize);
             List<TaskInfoApplicationDto> pagedTasks = allTasks.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            // Model için gereken verileri hazırlıyoruz
             var model = new Tuple<List<TaskInfoApplicationDto>, int, int>(pagedTasks, page, totalPages);
 
-            // View'a veri gönderiyoruz
-            ViewBag.SearchIp = searchIp; // Arama kutusundaki değeri korumak için
+            ViewBag.SearchQuery = searchQuery;
             return View(model);
         }
     }

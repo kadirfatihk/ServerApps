@@ -9,6 +9,7 @@ namespace ServerApps.Business.Usescasess.Task
 {
     public interface ITaskService
     {
-        List<TaskInfoApplicationDto> GetAllTasksFromWebSites();
+        List<TaskInfoApplicationDto> GetAllTasks();
+        
     }
 }

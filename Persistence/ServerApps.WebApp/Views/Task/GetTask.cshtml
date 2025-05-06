@@ -4,15 +4,30 @@
     ViewData["Title"] = "Web Sitesi Görevleri";
 }
 
+<div class="top-action-buttons">
+    <a href="/" class="btn btn-outline-success btn-custom-action">Anasayfa</a>
+    <a asp-controller="WebSite" asp-action="WebSite" class="btn btn-outline-info btn-custom-action">IIS</a>
+</div>
+
 <h2 class="mb-4">Web Sitesi Görevleri</h2>
 
-<!-- Arama Kutusu -->
 <form method="get" asp-controller="Task" asp-action="GetTask" class="mb-4">
     <div class="input-group">
-        <input type="text" name="searchIp" class="form-control" placeholder="IP adresine göre ara" value="@ViewBag.SearchIp" />
-        <button type="submit" class="btn btn-primary">Ara</button>
+        <input type="text" name="searchQuery" class="form-control" placeholder="Arama yapın..." value="@ViewBag.SearchQuery" />
+        <button type="submit" class="btn btn-success">Ara</button>
+        <!-- Temizleme ikonu -->
+        <button type="button" id="clearSearch" class="btn icon-toggle-btn" title="Temizle">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
     </div>
 </form>
+
+@if (Model.Item1 != null && Model.Item1.Any())
+{
+    <div id="searchResultMessage" class="alert alert-info" style="display: none;">
+        @Model.Item1.Count sonuç bulundu.
+    </div>
+}
 
 @if (Model.Item1 == null || !Model.Item1.Any())
 {
@@ -20,55 +35,43 @@
 }
 else
 {
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Uygulama Adı</th>
-                <th>IP Adresi</th>
-                <th>Görev Adı</th>
-                <th>Durum</th>
-                <th>Tetikleyici</th>
-                <th>Son Çalıştırma Zamanı</th>
-                <th>Sonuç</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var task in Model.Item1)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <td>@task.ApplicationName</td>
-                    <td>@task.Ip</td>
-                    <td>@task.TaskName</td>
-                    <td>
-                        @if (task.Status?.ToLower() == "started")
-                        {
-                            <span style="color: green;">✔️</span>
-                        }
-                        else if (task.Status?.ToLower() == "stopped")
-                        {
-                            <span style="color: red;">❌</span>
-                        }
-                        else
-                        {
-                            @task.Status
-                        }
-                    </td>
-                    <td>@task.Trigger</td>
-                    <td>@task.LastRunTime.ToString("dd.MM.yyyy HH:mm")</td>
-                    <td>@task.LastTaskResult</td>
+                    <th>IP Adresi</th>
+                    <th>Görev Adı</th>
+                    <th>Durum</th>
+                    <th>Tetikleyici</th>
+                    <th>Son Çalıştırma Zamanı</th>
+                    <th>Sonraki Çalıştırma Zamanı</th>
+                    <th>Sonuç</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Item1)
+                {
+                    <tr>
+                        <td>@task.Ip</td>
+                        <td>@task.TaskName</td>
+                        <td>@task.Status</td>
+                        <td>@task.Trigger</td>
+                        <td>@(task.LastRunTime.HasValue ? task.LastRunTime.Value.ToString("dd.MM.yyyy HH:mm") : "-")</td>
+                        <td>@(task.NextRunTime.HasValue ? task.NextRunTime.Value.ToString("dd.MM.yyyy HH:mm") : "-")</td>
+                        <td>@task.LastTaskResult</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
-    <!-- Sabit Sayfalama -->
     <div class="d-flex justify-content-center mt-4 fixed-pagination">
         <nav>
             <ul class="pagination">
                 @if (Model.Item2 > 1)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 - 1, searchIp = ViewBag.SearchIp })" aria-label="Önceki">
+                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 - 1, searchQuery = ViewBag.SearchQuery })" aria-label="Önceki">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
@@ -81,7 +84,7 @@ else
                 @if (Model.Item2 < Model.Item3)
                 {
                     <li class="page-item">
-                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 + 1, searchIp = ViewBag.SearchIp })" aria-label="Sonraki">
+                        <a class="page-link" href="@Url.Action("GetTask", new { page = Model.Item2 + 1, searchQuery = ViewBag.SearchQuery })" aria-label="Sonraki">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
@@ -91,8 +94,44 @@ else
     </div>
 }
 
-<!-- CSS Stili -->
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var resultMessage = document.getElementById('searchResultMessage');
+
+            if (resultMessage) {
+                resultMessage.style.display = 'block';
+                resultMessage.classList.add('fade-in');
+
+                setTimeout(function () {
+                    resultMessage.style.display = 'none';
+                }, 3000);
+            }
+
+            document.getElementById("clearSearch").addEventListener("click", function () {
+                document.querySelector("input[name='searchQuery']").value = '';
+                window.location.href = '@Url.Action("GetTask", "Task")';
+            });
+        });
+    </script>
+}
+
 <style>
+    .top-action-buttons {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .top-action-buttons .btn-custom-action {
+            width: 150px;
+            text-align: center;
+        }
+
     .fixed-pagination {
         position: fixed;
         bottom: 20px;
@@ -108,4 +147,48 @@ else
     .pagination {
         margin-bottom: 0;
     }
+
+    .fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .icon-toggle-btn {
+        background-color: #dc3545; /* Kırmızı */
+        color: #fff;
+        border: 1px solid #dc3545;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 5px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+        .icon-toggle-btn:hover {
+            background-color: #fff;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .icon-toggle-btn i {
+            font-size: 18px;
+        }
 </style>

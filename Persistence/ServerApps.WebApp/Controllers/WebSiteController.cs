@@ -16,46 +16,56 @@ public class WebSiteController : Controller
         _configurationService = configurationService;
     }
 
-    public IActionResult WebSite(int page = 1, string searchIp = "")
+    public IActionResult WebSite(int page = 1, string searchQuery = "")
     {
-        int pageSize = 10;
+        int pageSize = 20;
 
+        // IIS'den uygulamaları ve konfigürasyonları al
         var applications = _iisService.GetAllApplications();
         var configurations = _configurationService.GetConfigurations();
 
+        // Sunucu adlarını IP üzerinden grupla
         var serverNames = configurations
             .GroupBy(x => x.Ip)
             .ToDictionary(x => x.Key, x => x.First().Name);
 
+        // ViewModel listesi oluştur
         var viewModels = applications.Select(app => new ServerAppViewModel
         {
             ApplicationName = app.ApplicationName,
             Ip = app.Ip,
             Port = app.Port,
-            Status = app.Status,
-            //ServerName = serverNames.ContainsKey(app.Ip) ? serverNames[app.Ip] : "Bilinmeyen"
+            Status = app.Status
         }).ToList();
 
-        // Arama filtresi
-        if (!string.IsNullOrWhiteSpace(searchIp))
+        // Genel arama filtresi
+        if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             viewModels = viewModels
-                .Where(vm => vm.Ip != null && vm.Ip.Contains(searchIp))
+                .Where(vm =>
+                    (vm.ApplicationName != null && vm.ApplicationName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (vm.Ip != null && vm.Ip.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) ||
+                    (vm.Port.ToString().Contains(searchQuery)) ||
+                    (vm.Status != null && vm.Status.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)))
                 .ToList();
         }
 
+        // Toplam öğe sayısını ve sayfalama hesaplamalarını yap
         var totalItems = viewModels.Count;
-        var totalPages = (int)System.Math.Ceiling(totalItems / (double)pageSize);
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
         page = page < 1 ? 1 : page > totalPages ? totalPages : page;
 
+        // Sayfalama işlemi
         var pagedItems = viewModels
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
-        ViewBag.SearchIp = searchIp;
+        // ViewBag ile arama sorgusunu aktar
+        ViewBag.SearchQuery = searchQuery;
 
+        // Model oluştur ve View'a gönder
         var model = new Tuple<List<ServerAppViewModel>, int, int>(pagedItems, page, totalPages);
         return View(model);
     }
