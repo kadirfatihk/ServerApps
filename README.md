@@ -1,4 +1,4 @@
-# IIS Web Siteleri ve Görev Zamanlayıcı Listesi
+# ServerApps
 
 Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini ve görev zamanlayıcısındaki (Task Scheduler) görevleri listeleyen bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
 
