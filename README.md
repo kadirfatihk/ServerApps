@@ -53,7 +53,7 @@ Proje, **katmanlı mimari** yapısına sahiptir:
 ```json
 {
   "Applications": {
-    "64 Sunucusu": [ "192.168.1.64", "Administrator", "P@ssw0rd" ]
+    "Sunucu Adı": [ "IP Adresi", "Kullanıcı Adı", "Şifre" ]
   },
   "Logging": {
     "LogLevel": {
@@ -63,4 +63,27 @@ Proje, **katmanlı mimari** yapısına sahiptir:
   },
   "AllowedHosts": "*"
 }
+
+### 2. Gerekli Paketleri Yükleyin
+dotnet restore
+
+### 3. Projeyi Yayınlayın
+dotnet publish -c Release
+
+### 4. IIS Üzerinden Web Sitesi Olarak Yayınlayın
+- ** Yayınladığınız dosyaları uzak sunucuya kopyalayın
+- ** IIS üzerinden yeni bir web sitesi oluşturun ve bu dizini seçin
+- ** Web sitesini başlatın ve kontrol edin
+
+### Web Arayüzü Kullanımı
+- ** Web sitesine tarayıcı üzerinden erişin
+- ** Ana sayfada sunucular listelenir
+- ** İlgili sunucuya tıkladığınızda, o sunucudaki IIS web siteleri ve görev zamanlayıcı görevleri listelenir
+- ** Tüm veriler canlı olarak sunuculardan çekilir, veritabanı kullanılmaz
+
+## 🤝 Katkıda Bulunma
+- ** Bu projeyi fork edin
+- ** Yeni bir branch oluşturun (feature/yeniozellik)
+- ** Değişikliklerinizi yapın ve commit edin
+- ** Pull Request gönderin
 
