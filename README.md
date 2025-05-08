@@ -1,34 +1,59 @@
 # ServerApps
-## Proje Açıklaması
-Bu proje, appsettings.json dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini ve görev zamanlayıcısındaki (Task Scheduler) görevleri listeleyen bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
 
-## Amaç
-* appsettings.json dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
-* Uzak sunucudaki IIS üzerindeki web sitelerini listeler.
-* Uzak sunucudaki görev zamanlayıcısından (Task Scheduler) görevleri listeler.
+## 📌 Proje Açıklaması
 
-## Teknolojiler
-* .NET 8
-* Entity Framework Core
-* Bootstrap
-* CSS ve JavaScript
-* MVC
-* PowerShell
+ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara bağlanarak, IIS üzerindeki web sitelerini ve Görev Zamanlayıcı (Task Scheduler) görevlerini dinamik olarak listeleyen bir .NET 8 uygulamasıdır. Hem Web API hem de MVC tabanlı kullanıcı arayüzü ile geliştirilmiştir. 
 
-## Kullanılan Kütüphaneler
-* Cake.Powershell
-* Microsoft.Extensions.Configuration.Binding
-* Microsoft.Extensions.Hosting
-* TaskScheduler
-* Microsoft.EntityFrameworkCore
-* Microsoft.EntityFrameworkCore.Design
-* Microsoft.EntityFrameworkCore.Tools
+## 🎯 Amaç
 
-## Kurulum
-**1. Uzak Sunucu Bağlantısı** 
+- `appsettings.json` üzerinden alınan bağlantı bilgileri ile uzak sunuculara erişmek
+- Her sunucudaki IIS web sitelerini listelemek
+- Web sitelerine ait Görev Zamanlayıcı (Task Scheduler) görevlerini listelemek
+- Kullanıcı dostu arayüz ile verileri görsel olarak sunmak
+
+## 🛠️ Kullanılan Teknolojiler ve Diller
+
+### Backend
+- **.NET 8**
+- **C#**
+- **Entity Framework Core**
+- **PowerShell** (SCHTASKS.EXE ile görev listeleme)
+
+### Frontend
+- **MVC**
+- **Bootstrap**
+- **CSS**
+- **JavaScript**
+
+## 📚 Kullanılan Kütüphaneler
+
+- `Cake.Powershell`
+- `Microsoft.Extensions.Configuration.Binding`
+- `Microsoft.Extensions.Hosting`
+- `Microsoft.EntityFrameworkCore`
+- `Microsoft.EntityFrameworkCore.Design`
+- `Microsoft.EntityFrameworkCore.Tools`
+- `TaskScheduler`
+
+## 🧱 Proje Mimarisi
+
+Proje, **katmanlı mimari** yapısına sahiptir:
+
+- **Core**: İş mantığını ve veri modellerini barındırır.
+- **Persistence**: IIS ve Task Scheduler gibi kaynaklardan veri çekme işlemlerini gerçekleştirir.
+- **WebAPI**: Sunucu bilgilerini işleyerek gerekli verileri API olarak sunar.
+- **WebApp (MVC)**: Bootstrap destekli kullanıcı arayüzü ile verileri kullanıcıya sunar.
+
+## ⚙️ Kurulum ve Kullanım
+
+### 1. Uzak Sunucu Bilgilerini Tanımlayın
+
+`appsettings.json` dosyasını aşağıdaki gibi yapılandırın:
+
+```json
 {
   "Applications": {
-    "64 Sunucusu": [ "uzak sunucu ıp", "username", "password" ]
+    "64 Sunucusu": [ "192.168.1.64", "Administrator", "P@ssw0rd" ]
   },
   "Logging": {
     "LogLevel": {
@@ -39,23 +64,3 @@ Bu proje, appsettings.json dosyasına yazılan sunucu bilgilerini kullanarak, be
   "AllowedHosts": "*"
 }
 
-**2. Gerekli Kütüphaneleri Yükleyin**
-dotnet restore
-
-**3. Projeyi Yayınlayın**
-dotnet publish -c Release
-
-**4. Uzak Sunucuda IIS'e Ekleme**
-Proje, uzak sunucudaki IIS'e bir web sitesi olarak eklendi. IIS üzerinden çalıştırıldıktan sonra başarıyla çalıştığı doğrulandı.
-
-**5. Çalıştırma**
-Projeyi çalıştırmak için aşağıdaki komutu kullanabilirsiniz:
-dotnet run
-
-**6. Kullanım**
-Web sitesi üzerinden IIS web sitelerini ve görev zamanlayıcısındaki görevleri görüntüleyebilirsiniz. Kullanıcı arayüzü (UI) Bootstrap ile tasarlandı ve her iki işlem için de sonuçlar ekranda listelenir.
-
-## Katkıda Bulunma
-**1.Depoyu fork edin.**
-**2. Yeni bir özellik ekleyin veya hata düzeltmesi yapın.**
-**3. Değişikliklerinizi bir pull request olarak gönderin.**
