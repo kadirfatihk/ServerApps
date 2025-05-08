@@ -1,23 +1,20 @@
 # ServerApps
 
 ## 📌 Proje Açıklaması
-
-ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara bağlanarak, IIS üzerindeki web sitelerini ve Görev Zamanlayıcı (Task Scheduler) görevlerini dinamik olarak listeleyen bir .NET 8 uygulamasıdır. Hem Web API hem de MVC tabanlı kullanıcı arayüzü ile geliştirilmiştir. 
+ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara bağlanarak, IIS üzerindeki web sitelerini ve Görev Zamanlayıcı (Task Scheduler) görevlerini dinamik olarak listeleyen bir .NET 8 uygulamasıdır. Hem Web API hem de MVC tabanlı kullanıcı arayüzü ile geliştirilmiştir.
 
 ## 🎯 Amaç
-
 - `appsettings.json` üzerinden alınan bağlantı bilgileri ile uzak sunuculara erişmek
 - Her sunucudaki IIS web sitelerini listelemek
 - Web sitelerine ait Görev Zamanlayıcı (Task Scheduler) görevlerini listelemek
 - Kullanıcı dostu arayüz ile verileri görsel olarak sunmak
 
 ## 🛠️ Kullanılan Teknolojiler ve Diller
-
 ### Backend
 - **.NET 8**
 - **C#**
 - **Entity Framework Core**
-- **PowerShell** (SCHTASKS.EXE ile görev listeleme)
+- **PowerShell**
 
 ### Frontend
 - **MVC**
@@ -26,7 +23,6 @@ ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara
 - **JavaScript**
 
 ## 📚 Kullanılan Kütüphaneler
-
 - `Cake.Powershell`
 - `Microsoft.Extensions.Configuration.Binding`
 - `Microsoft.Extensions.Hosting`
@@ -36,7 +32,6 @@ ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara
 - `TaskScheduler`
 
 ## 🧱 Proje Mimarisi
-
 Proje, **katmanlı mimari** yapısına sahiptir:
 
 - **Core**: İş mantığını ve veri modellerini barındırır.
@@ -47,13 +42,11 @@ Proje, **katmanlı mimari** yapısına sahiptir:
 ## ⚙️ Kurulum ve Kullanım
 
 ### 1. Uzak Sunucu Bilgilerini Tanımlayın
-
 `appsettings.json` dosyasını aşağıdaki gibi yapılandırın:
-
-```json
+```
 {
   "Applications": {
-    "Sunucu Adı": [ "IP Adresi", "Kullanıcı Adı", "Şifre" ]
+    "SUNUCU_ADI": [ "IP", "KULLANICI_ADI", "ŞİFRE" ]
   },
   "Logging": {
     "LogLevel": {
@@ -63,27 +56,28 @@ Proje, **katmanlı mimari** yapısına sahiptir:
   },
   "AllowedHosts": "*"
 }
-
+```
 ### 2. Gerekli Paketleri Yükleyin
+Proje bağımlılıklarını yüklemek için terminal üzerinden aşağıdaki komutu çalıştırın:
 dotnet restore
 
 ### 3. Projeyi Yayınlayın
+Projeyi yayınlamak için aşağıdaki komutu kullanın:
 dotnet publish -c Release
 
 ### 4. IIS Üzerinden Web Sitesi Olarak Yayınlayın
-- ** Yayınladığınız dosyaları uzak sunucuya kopyalayın
-- ** IIS üzerinden yeni bir web sitesi oluşturun ve bu dizini seçin
-- ** Web sitesini başlatın ve kontrol edin
+- Yayınladığınız dosyaları uzak sunucuya kopyalayın.
+- IIS üzerinden yeni bir web sitesi oluşturun ve bu dizini seçin.
+- Web sitesini başlatın ve kontrol edin.
 
-### Web Arayüzü Kullanımı
-- ** Web sitesine tarayıcı üzerinden erişin
-- ** Ana sayfada sunucular listelenir
-- ** İlgili sunucuya tıkladığınızda, o sunucudaki IIS web siteleri ve görev zamanlayıcı görevleri listelenir
-- ** Tüm veriler canlı olarak sunuculardan çekilir, veritabanı kullanılmaz
+### 5. Web Arayüzü Kullanımı
+- Web sitesine tarayıcı üzerinden erişin.
+- Ana sayfada sunucular listelenir.
+- İlgili sunucuya tıkladığınızda, o sunucudaki IIS web siteleri ve görev zamanlayıcı görevleri listelenir.
+- Tüm veriler canlı olarak sunuculardan çekilir, veritabanı kullanılmaz.
 
 ## 🤝 Katkıda Bulunma
-- ** Bu projeyi fork edin
-- ** Yeni bir branch oluşturun (feature/yeniozellik)
-- ** Değişikliklerinizi yapın ve commit edin
-- ** Pull Request gönderin
-
+- Bu projeyi fork edin.
+- Yeni bir branch oluşturun (feature/yeniozellik).
+- Değişikliklerinizi yapın ve commit edin.
+- Pull Request gönderin.
