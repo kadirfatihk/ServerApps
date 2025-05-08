@@ -112,7 +112,5 @@ dotnet publish -c Release
 ---
 
 ## Proje Görselleri
-![Anasayfa](https://www.example.com/gorsel.png)
-![IIS Sayfası](https://www.example.com/gorsel.png)
-![Task Sayfası](https://www.example.com/gorsel.png)
-
+![Anasayfa](./images/Anasayfa.png)
+![IIS](./images/IIS.png)
