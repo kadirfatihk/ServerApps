@@ -112,5 +112,6 @@ dotnet publish -c Release
 ---
 
 ## Proje Görselleri
-![Anasayfa](./images/Anasayfa.png)
-![IIS](./images/IIS.png)
+![Image](https://github.com/user-attachments/assets/97fe9631-f6ba-4b44-afde-27604fbc0abd)
+
+![Image](https://github.com/user-attachments/assets/3986ec39-2e6b-4a70-87e9-518ab3d044f6)
