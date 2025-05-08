@@ -14,7 +14,10 @@
 <form method="get" asp-controller="Task" asp-action="GetTask" class="mb-4">
     <div class="input-group">
         <input type="text" name="searchQuery" class="form-control" placeholder="Arama yapın..." value="@ViewBag.SearchQuery" />
-        <button type="submit" class="btn btn-success">Ara</button>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-search"></i>
+        </button>
+
         <!-- Temizleme ikonu -->
         <button type="button" id="clearSearch" class="btn icon-toggle-btn" title="Temizle">
             <i class="bi bi-arrow-clockwise"></i>
@@ -138,10 +141,10 @@ else
         left: 50%;
         transform: translateX(-50%);
         z-index: 999;
-        width: 100%;
-        padding: 10px 0;
+        width: auto;
         background-color: #fff;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
     }
 
     .pagination {
@@ -153,19 +156,27 @@ else
     }
 
     @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
+        from
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
     }
 
     .table-responsive {
         overflow-x: auto;
+        padding-bottom: 50px; /* Pagination alanı için alt boşluk ekle */
+    }
+
+    .table {
+        margin-bottom: 50px; /* Pagination alanıyla çakışmayı engellemek için tabloya alt boşluk ekle */
     }
 
     .icon-toggle-btn {
@@ -191,4 +202,19 @@ else
         .icon-toggle-btn i {
             font-size: 18px;
         }
+
+    /* Arama çubuğu ile buton arasındaki mesafeyi artır */
+    .input-group input.form-control {
+        margin-right: 15px; /* Arama çubuğu ile buton arasındaki mesafeyi artır */
+    }
+
+    /* Arama butonunu, temizleme butonundan da ayırmak için */
+    .input-group button[type="submit"] {
+        margin-left: 15px; /* Ara buton ile temizleme butonu arasındaki mesafeyi artır */
+    }
+
+    /* Temizleme butonunu ayırmak için ek stil */
+    .input-group button#clearSearch {
+        margin-left: 15px; /* Temizleme butonu ile arama butonu arasındaki mesafeyi artır */
+    }
 </style>
