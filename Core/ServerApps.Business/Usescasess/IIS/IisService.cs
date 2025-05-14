@@ -1,10 +1,11 @@
 ﻿using Microsoft.Web.Administration;
 using Microsoft.Win32.TaskScheduler; // TaskScheduler API'si
-using ServerApps.Business.Dtos;
+using ServerApps.Business.Dtos.IisDtos;
 using ServerApps.Business.Usescasess.Configuration;
 using ServerApps.Business.Usescasess.IIS;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
@@ -157,5 +158,129 @@ public class IisService : IIisService
         }
 
         return result; // Tüm siteler dönülür
+    }
+
+    public void StartWebSite(string ip, string siteName)
+    {
+        var configurations = _configurationService.GetConfigurations();
+        var config = configurations.FirstOrDefault(c => c.Ip == ip);
+
+        if (config is null)
+            throw new Exception("Sunucu yapılandırması bullunamadı.");
+
+        if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+            using (var manager = new ServerManager())
+            {
+                var site = manager.Sites.FirstOrDefault(s => s.Name == siteName);
+
+                if (site is not null)
+                    site.Start();
+                else
+                    throw new Exception($"Site '{siteName}' bulunamadı.");
+            }
+        else
+        {
+            ExecutePowerShellCommand(ip, $@"
+            Import-Module WebAdministration
+            Start-Website -Name '{siteName}'
+        ");
+        }
+    }
+
+    public void StopWebSite(string ip, string siteName)
+    {
+        var configurations = _configurationService.GetConfigurations();
+        var config = configurations.FirstOrDefault(c => c.Ip == ip);
+
+        if (config is null)
+            throw new Exception("Sunucu yapılandırması bulunamadı.");
+
+        if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+            using (var manager = new ServerManager())
+            {
+                var site = manager.Sites.FirstOrDefault(s => s.Name == siteName);
+
+                if (site is not null)
+                    site.Stop();
+                else
+                    throw new Exception($"Site '{siteName}' bulunamadı.");
+            }
+        else
+        {
+            ExecutePowerShellCommand(ip, $@"
+            Import-Module WebAdministration
+            Stop-Website -Name '{siteName}'
+        ");
+        }
+    }
+
+    public void UpdateWebSitePort(string ip, string siteName, int newPort)
+    {
+        var config = _configurationService.GetConfigurations();
+
+        if (config is null)
+            throw new Exception("Sunucu bulunamadı.");
+
+        if(ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+        {
+            using var manager = new ServerManager();
+
+            var site = manager.Sites.FirstOrDefault(s=>s.Name == siteName);
+
+            if(site is null)
+                throw new Exception("Site bulunamadı.");
+
+            var binding = site.Bindings.FirstOrDefault();
+            if (binding == null)
+                throw new Exception("Binding bulunamadı.");
+
+            binding.BindingInformation = $"*:{newPort}:"; // Yeni port atanır
+            manager.CommitChanges();
+        }
+        else
+        {
+            // PowerShell üzerinden uzak bağlantı
+            string psScript = $@"
+            Import-Module WebAdministration
+            $site = Get-Website -Name '{siteName}'
+            if ($site -eq $null) {{ throw 'Site bulunamadı.' }}
+            $binding = Get-WebBinding -Name '{siteName}' | Select-Object -First 1
+            if ($binding -ne $null) {{
+                Remove-WebBinding -Name '{siteName}' -BindingInformation $binding.bindingInformation -Protocol $binding.protocol
+                New-WebBinding -Name '{siteName}' -Protocol 'http' -Port {newPort} -IPAddress '*'
+            }}";
+
+            ExecutePowerShellCommand(ip, psScript);
+        }
+    }
+
+    private void ExecutePowerShellCommand(string ip, string script)
+    {
+        var configuration = _configurationService.GetConfigurations();
+        var config = configuration.FirstOrDefault(c => c.Ip == ip);
+
+         if (config is null)
+            throw new Exception("Sunucu yapılandırması bulunamadı.");
+
+        var securePwd = new System.Security.SecureString();
+        foreach (char c in config.Password)
+            securePwd.AppendChar(c);
+        securePwd.MakeReadOnly();
+
+        var credential = new PSCredential(config.Username, securePwd);
+
+        var connectionInfo = new WSManConnectionInfo(new Uri($"http://{config.Ip}:5985/wsman"),
+            "http://schemas.microsoft.com/powershell/Microsoft.PowerShell", credential);
+
+        connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Default;
+
+        using var runspace = RunspaceFactory.CreateRunspace(connectionInfo);
+        runspace.Open();
+
+        using var ps = PowerShell.Create();
+        ps.Runspace = runspace;
+
+        ps.AddScript(script);
+        ps.Invoke();
     }
 }

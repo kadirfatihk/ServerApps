@@ -1,4 +1,4 @@
-﻿namespace ServerApps.Business.Dtos
+﻿namespace ServerApps.Business.Dtos.ConfigurationDtos
 {
     public class GetConfigurationDto
     {

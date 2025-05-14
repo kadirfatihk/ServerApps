@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using ServerApps.Business.Dtos;
+using ServerApps.Business.Dtos.ConfigurationDtos;
 using ServerApps.Business.Usescasess.Configuration;
 //using ServerApps.Core.Configuration;
 

@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Event Viewer";
+    var ipAddress = ViewBag.IpAddress as string ?? "127.0.0.1"; // örnek ip
+}
+
+<div class="top-action-buttons">
+    <a href="/" class="btn btn-outline-success btn-custom-action">Anasayfa</a>
+    <a asp-controller="WebSite" asp-action="GetWebSites" class="btn btn-outline-info btn-custom-action">IIS</a>
+    <a asp-controller="Task" asp-action="GetTasks" class="btn btn-outline-info btn-custom-action">Task</a>
+</div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-2">
+            <label class="form-label"><strong>IP Adresi</strong></label>
+            <p>@ipAddress</p>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label"><strong>Event Viewer</strong></label><br />
+            <a asp-controller="Event" asp-action="ListEvents" asp-route-ip="@ipAddress" class="btn btn-dark">Listele</a>
+        </div>
+    </div>
+</div>
+
+<footer class="navbar fixed-bottom bg-light text-center">
+    <div class="container">
+        <span class="text-muted">NAVBAR</span>
+    </div>
+</footer>
+
+<style>
+    .top-action-buttons {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-custom-action {
+        width: 100px;
+        text-align: center;
+    }
+
+    .container {
+        margin-top: 80px;
+    }
+
+    footer.navbar {
+        border-top: 1px solid #ccc;
+        padding: 10px 0;
+    }
+</style>

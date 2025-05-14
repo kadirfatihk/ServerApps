@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServerApps.Business.Dtos.IisDtos;
 using ServerApps.Business.Usescasess.Configuration;
 using ServerApps.Business.Usescasess.IIS;
 using ServerApps.WebApp.ViewModels;
@@ -16,9 +17,10 @@ public class WebSiteController : Controller
         _configurationService = configurationService;
     }
 
-    public IActionResult WebSite(int page = 1, string searchQuery = "")
+    [HttpGet]
+    public IActionResult GetWebSites(int page = 1, string searchQuery = "")
     {
-        int pageSize = 10;
+        int pageSize = 15;
 
         // IIS'den uygulamaları ve konfigürasyonları al
         var applications = _iisService.GetAllApplications();
@@ -67,6 +69,27 @@ public class WebSiteController : Controller
 
         // Model oluştur ve View'a gönder
         var model = new Tuple<List<ServerAppViewModel>, int, int>(pagedItems, page, totalPages);
-        return View(model);
+        return View("~/Views/WebSite/GetWebSites.cshtml", model);
+    }
+
+    [HttpPost]
+    public IActionResult StartWebSite([FromForm] StartStopWebSiteDto dto)
+    {
+        _iisService.StartWebSite(dto.Ip, dto.SiteName);
+        return RedirectToAction("GetWebSites"); // Sayfayı yeniden yükle
+    }
+
+    [HttpPost]
+    public IActionResult StopWebSite([FromForm] StartStopWebSiteDto dto)
+    {
+        _iisService.StopWebSite(dto.Ip, dto.SiteName);
+        return RedirectToAction("GetWebSites"); // Sayfayı yeniden yükle
+    }
+
+    [HttpPost]
+    public IActionResult UpdatePort([FromForm] UpdatePortDto dto)
+    {
+        _iisService.UpdateWebSitePort(dto.Ip, dto.SiteName, dto.NewPort);
+        return RedirectToAction("GetWebSites"); // Sayfayı yeniden yükle
     }
 }

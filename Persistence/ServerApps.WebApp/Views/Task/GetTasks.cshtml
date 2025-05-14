@@ -1,0 +1,216 @@
+﻿@using ServerApps.Business.Dtos.TaskDtos
+@model Tuple<List<TaskInfoApplicationDto>, int, int>
+
+@{
+    ViewData["Title"] = "Web Sitesi Görevleri";
+}
+
+<div class="top-action-buttons">
+    <a href="/" class="btn btn-outline-success btn-custom-action">Anasayfa</a>
+    <a asp-controller="WebSite" asp-action="GetWebSites" class="btn btn-outline-info btn-custom-action">IIS</a>
+    <a asp-controller="Event" asp-action="GetEvents" class="btn btn-outline-info btn-custom-action">Event</a>
+</div>
+
+<h2 class="mb-4">Task</h2>
+
+<form method="get" asp-controller="Task" asp-action="GetTasks" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="searchQuery" class="form-control" placeholder="Arama yapın..." value="@ViewBag.SearchQuery" />
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-search"></i>
+        </button>
+        <button type="button" id="clearSearch" class="btn icon-toggle-btn" title="Temizle">
+            <i class="bi bi-arrow-clockwise"></i>
+        </button>
+    </div>
+</form>
+
+@if (Model.Item1 != null && Model.Item1.Any())
+{
+    <div id="searchResultMessage" class="alert alert-info" style="display: none;">
+        @Model.Item1.Count sonuç bulundu.
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">Hiçbir görev bulunamadı.</div>
+}
+
+@if (Model.Item1 != null && Model.Item1.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>IP Adresi</th>
+                    <th>Görev Adı</th>
+                    <th>Durum</th>
+                    <th>Tetikleyici</th>
+                    <th>Son Çalıştırma Zamanı</th>
+                    <th>Sonraki Çalıştırma Zamanı</th>
+                    <th>Sonuç</th>
+                    <th class="text-center">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model.Item1)
+                {
+                    var rowId = $"task-{task.TaskName.Replace("\\", "").Replace(" ", "")}-{task.Ip.Replace(".", "")}";
+                    <tr id="@rowId">
+                        <td>@task.Ip</td>
+                        <td>@task.TaskName</td>
+                        <td class="task-status">@task.Status</td>
+                        <td>@task.Trigger</td>
+                        <td>@(task.LastRunTime.HasValue ? task.LastRunTime.Value.ToString("dd.MM.yyyy HH:mm") : "-")</td>
+                        <td>@(task.NextRunTime.HasValue ? task.NextRunTime.Value.ToString("dd.MM.yyyy HH:mm") : "-")</td>
+                        <td>@task.LastTaskResult</td>
+                        <td class="text-center">
+                            @if (task.Status.ToLower() == "ready")
+                            {
+                                <button type="button" class="btn btn-danger" onclick="changeTaskStatus('@task.TaskName', '@task.Ip', 'disabled')">
+                                    Disable
+                                </button>
+                            }
+                            else if (task.Status.ToLower() == "disabled")
+                            {
+                                <button type="button" class="btn btn-success" onclick="changeTaskStatus('@task.TaskName', '@task.Ip', 'ready')">
+                                    Ready
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Sayfalama">
+            <ul class="pagination">
+                @for (int i = 1; i <= Model.Item3; i++)
+                {
+                    <li class="page-item @(i == Model.Item2 ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var resultMessage = document.getElementById('searchResultMessage');
+            if (resultMessage) {
+                resultMessage.style.display = 'block';
+                resultMessage.classList.add('fade-in');
+                setTimeout(function () {
+                    resultMessage.style.display = 'none';
+                }, 3000);
+            }
+
+            document.getElementById("clearSearch").addEventListener("click", function () {
+                document.querySelector("input[name='searchQuery']").value = '';
+                window.location.href = '@Url.Action("GetTasks", "Task")';
+            });
+        });
+
+        function generateRowId(taskName, ipAddress) {
+            return "task-" + taskName.replace(/\\|\s/g, "") + "-" + ipAddress.replace(/\./g, "");
+        }
+
+        function changeTaskStatus(taskName, ipAddress, status) {
+            let confirmation = confirm(`Görev "${taskName}" (${ipAddress}) durumunu "${status}" yapmak istiyor musunuz?`);
+            if (!confirmation) return;
+
+            $.ajax({
+                url: '@Url.Action("ChangeTaskStatus", "Task")',
+                type: 'POST',
+                data: {
+                    taskName: taskName,
+                    ipAddress: ipAddress,
+                    status: status
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Durum başarıyla değiştirildi.");
+                        let rowId = generateRowId(taskName, ipAddress);
+                        let taskRow = $("#" + rowId);
+                        let statusCell = taskRow.find(".task-status");
+                        statusCell.text(status.charAt(0).toUpperCase() + status.slice(1));
+                        location.reload(); // Yenileme
+                    } else {
+                        alert("Hata: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Bir hata oluştu.");
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .top-action-buttons {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .top-action-buttons .btn-custom-action {
+            width: 150px;
+            text-align: center;
+        }
+
+    .icon-toggle-btn {
+        background-color: #dc3545;
+        color: #fff;
+        border: 1px solid #dc3545;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 5px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+        .icon-toggle-btn:hover {
+            background-color: #fff;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        .icon-toggle-btn i {
+            font-size: 18px;
+        }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    td.text-center button {
+        min-width: 100px;
+    }
+
+    .fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

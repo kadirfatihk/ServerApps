@@ -5,6 +5,23 @@
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
 
+<main role="main" class="pb-3">
+    <div class="center-container">
+        <h2>İşlem Seçin</h2>
+        <div class="mt-4">
+            <a asp-action="GetWebSites" asp-controller="WebSite" class="btn btn-outline-primary btn-custom mx-2">IIS</a>
+            <a asp-action="GetTasks" asp-controller="Task" class="btn btn-outline-warning btn-custom mx-2">TASK</a>
+            <a asp-action="GetEvents" asp-controller="Event" class="btn btn-outline-warning btn-custom mx-2">EVENT</a>
+        </div>
+    </div>
+</main>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2025 - ServerApps.WebApp
+    </div>
+</footer>
+
 <style>
     body {
         font-family: 'Open Sans', sans-serif;
@@ -114,19 +131,3 @@
         padding-bottom: 60px;
     }
 </style>
-
-<main role="main" class="pb-3">
-    <div class="center-container">
-        <h2>İşlem Seçin</h2>
-        <div class="mt-4">
-            <a asp-action="WebSite" asp-controller="WebSite" class="btn btn-outline-primary btn-custom mx-2">IIS</a>
-            <a asp-action="GetTask" asp-controller="Task" class="btn btn-outline-warning btn-custom mx-2">TASK</a>
-        </div>
-    </div>
-</main>
-
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - ServerApps.WebApp
-    </div>
-</footer>

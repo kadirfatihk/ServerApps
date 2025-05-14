@@ -1,9 +1,15 @@
 using ServerApps.Business.Configuration;
+using ServerApps.Business.Usescasess;
+
+//using ServerApps.Business.Services;
+
 //using ServerApps.Business.IIS;
 using ServerApps.Business.Usescasess.Configuration;
+using ServerApps.Business.Usescasess.Event;
 using ServerApps.Business.Usescasess.IIS;
 using ServerApps.Business.Usescasess.Task;
 using ServerApps.Business.Usescasess.TaskScheduler;
+//using ServerApps.Business.Usescasess.TaskScheduler;
 //using ServerApps.Business.Usescasess.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +21,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
 builder.Services.AddScoped<IIisService, IisService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IEventService, EventService>();
 
 // IConfiguration servisini ekliyoruz
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);

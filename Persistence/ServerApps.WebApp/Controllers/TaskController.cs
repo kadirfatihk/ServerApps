@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ServerApps.Business.Dtos;
+using ServerApps.Business.Dtos.TaskDtos;
 using ServerApps.Business.Usescasess.Task;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,9 +16,9 @@ namespace ServerApps.WebApp.Controllers
             _taskService = taskService;
         }
 
-        public IActionResult GetTask(string searchQuery, int page = 1)
+        public IActionResult GetTasks(string searchQuery, int page = 1)
         {
-            int pageSize = 10;
+            int pageSize = 15;
 
             List<TaskInfoApplicationDto> allTasks = _taskService.GetAllTasks();
 
@@ -40,9 +41,54 @@ namespace ServerApps.WebApp.Controllers
             List<TaskInfoApplicationDto> pagedTasks = allTasks.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var model = new Tuple<List<TaskInfoApplicationDto>, int, int>(pagedTasks, page, totalPages);
-
             ViewBag.SearchQuery = searchQuery;
-            return View(model);
+
+            return View("~/Views/Task/GetTasks.cshtml", model);
+
+        }
+
+        [HttpPost]
+        public IActionResult ChangeTaskStatus(string taskName, string ipAddress, string status)
+        {
+            try
+            {
+                // Parametrelerin kontrolü
+                if (string.IsNullOrEmpty(taskName) || string.IsNullOrEmpty(ipAddress) || string.IsNullOrEmpty(status))
+                {
+                    return Json(new { success = false, message = "Eksik parametre gönderildi." });
+                }
+
+                // Durum geçerliliği kontrolü
+                var validStatuses = new[] { "disabled", "ready", "running" };
+                if (!validStatuses.Contains(status.ToLower()))
+                {
+                    return Json(new { success = false, message = "Geçersiz durum: " + status });
+                }
+
+                string resultMessage;
+
+                // Durum değişikliği
+                switch (status.ToLower())
+                {
+                    case "disabled":
+                        resultMessage = _taskService.DisableTask(ipAddress, taskName);
+                        break;
+                    case "ready":
+                        resultMessage = _taskService.EnableTask(ipAddress, taskName);
+                        break;
+                    case "running":
+                        resultMessage = _taskService.StartTask(ipAddress, taskName);
+                        break;
+                    default:
+                        return Json(new { success = false, message = "Geçersiz durum: " + status });
+                }
+
+                return Json(new { success = true, message = resultMessage });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Hata oluştu: " + ex.Message });
+            }
         }
     }
 }

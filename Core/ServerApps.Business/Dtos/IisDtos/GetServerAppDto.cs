@@ -1,4 +1,4 @@
-﻿namespace ServerApps.Business.Dtos
+﻿namespace ServerApps.Business.Dtos.IisDtos
 {
     public class GetServerAppDto
     {

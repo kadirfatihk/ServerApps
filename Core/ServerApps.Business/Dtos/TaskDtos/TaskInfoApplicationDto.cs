@@ -1,4 +1,4 @@
-﻿namespace ServerApps.Business.Dtos
+﻿namespace ServerApps.Business.Dtos.TaskDtos
 {
     public class TaskInfoApplicationDto
     {

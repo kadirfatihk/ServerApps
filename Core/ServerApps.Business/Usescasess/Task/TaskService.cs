@@ -1,4 +1,4 @@
-﻿using ServerApps.Business.Dtos; // Görev bilgilerini taşımak için kullanılan DTO sınıfını içe aktarır
+﻿using ServerApps.Business.Dtos.TaskDtos;
 using ServerApps.Business.Usescasess.Configuration; // Sunucu yapılandırmalarını getiren servis sınıfını içe aktarır
 using ServerApps.Business.Usescasess.Task; // ITaskService arayüzünü içe aktarır
 using System; // Temel .NET sınıfları için namespace
@@ -136,6 +136,78 @@ namespace ServerApps.Business.Usescasess.TaskScheduler
             };
         }
 
+        public string StartTask(string ip, string taskName)
+        {
+            return ExecuteTaskCommand(ip, taskName, "Start-ScheduledTask");
+        }
 
+        public string DisableTask(string ip, string taskName)
+        {
+            return ExecuteTaskCommand(ip, taskName, "Disable-ScheduledTask");
+        }
+
+        public string EnableTask(string ip, string taskName)
+        {
+            return ExecuteTaskCommand(ip, taskName, "Enable-ScheduledTask");
+        }
+
+        private string ExecuteTaskCommand(string ip, string taskName, string command)
+        {
+            // Belirtilen IP adresine göre yapılandırma bilgilerini (kullanıcı adı, şifre vs.) alıyoruz
+            var config = _configurationService.GetConfigurations().FirstOrDefault(c => c.Ip == ip);
+            if (config == null)
+                return "Sunucu yapılandırması bulunamadı."; // IP'ye karşılık gelen bir yapılandırma yoksa hata mesajı döndür
+
+            // PowerShell komutu oluşturuluyor, örneğin: Start-ScheduledTask -TaskName "MyTask" -TaskPath '\'
+            string script = $"{command} -TaskName \"{taskName}\" -TaskPath '\\'";
+
+            try
+            {
+                // Eğer hedef IP localhost ise, PowerShell komutu yerel olarak çalıştırılır
+                if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+                {
+                    using PowerShell ps = PowerShell.Create(); // Yeni bir PowerShell oturumu oluşturulur
+                    ps.AddScript(script);                      // Komut PowerShell'e eklenir
+                    ps.Invoke();                               // Komut çalıştırılır
+                }
+                else
+                {
+                    // Uzak sunucu için güvenli parola nesnesi oluşturulur
+                    var securePwd = new SecureString();
+                    foreach (char c in config.Password)
+                        securePwd.AppendChar(c);              // Parolanın her karakteri güvenli şekilde eklenir
+                    securePwd.MakeReadOnly();                 // Parola salt okunur yapılır
+
+                    // Kullanıcı adı ve parola bilgisiyle PSCredential nesnesi oluşturulur
+                    var credential = new PSCredential(config.Username, securePwd);
+
+                    // WSMan bağlantı bilgileri tanımlanır (WinRM protokolü kullanılır)
+                    var connectionInfo = new WSManConnectionInfo(
+                        new Uri($"http://{ip}:5985/wsman"),    // Uzak sunucuya erişim URI'si
+                        "http://schemas.microsoft.com/powershell/Microsoft.PowerShell", // Namespace
+                        credential                             // Kimlik bilgileri
+                    );
+                    connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Default; // Varsayılan kimlik doğrulama
+
+                    // PowerShell runspace oluşturulup bağlantı açılır
+                    using var runspace = RunspaceFactory.CreateRunspace(connectionInfo);
+                    runspace.Open();                           // Uzak sunucu ile bağlantı kuruluyor
+
+                    // Uzak PowerShell oturumu için yeni PowerShell nesnesi oluşturuluyor
+                    using PowerShell ps = PowerShell.Create();
+                    ps.Runspace = runspace;                    // Runspace bağlanıyor (uzaktan komut çalıştırmak için)
+                    ps.AddScript(script);                      // Komut PowerShell'e ekleniyor
+                    ps.Invoke();                               // Komut çalıştırılıyor
+                }
+
+                // İşlem başarılıysa bilgi mesajı döndürülüyor
+                return $"{taskName} görevinde {command} komutu başarıyla çalıştırıldı.";
+            }
+            catch (Exception ex)
+            {
+                // Herhangi bir hata oluşursa detaylı hata mesajı döndürülüyor
+                return $"Hata oluştu: {ex.Message}";
+            }
+        }
     }
 }
