@@ -2,17 +2,26 @@
 @model Tuple<List<TaskInfoApplicationDto>, int, int>
 
 @{
-    ViewData["Title"] = "Web Sitesi Görevleri";
+    ViewData["Title"] = "Tasks";
 }
 
+<!-- Tam ekran spinner -->
+<div id="fullPageSpinner" class="spinner-overlay">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<!--Sağ üst butonlar-->
 <div class="top-action-buttons">
-    <a href="/" class="btn btn-outline-success btn-custom-action">Anasayfa</a>
+    <a href="/" class="btn btn-outline-success btn-custom-action">HomePage</a>
     <a asp-controller="WebSite" asp-action="GetWebSites" class="btn btn-outline-info btn-custom-action">IIS</a>
     <a asp-controller="Event" asp-action="GetEvents" class="btn btn-outline-info btn-custom-action">Event</a>
 </div>
 
 <h2 class="mb-4">Task</h2>
 
+<!--Arama kutusu-->
 <form method="get" asp-controller="Task" asp-action="GetTasks" class="mb-4">
     <div class="input-group">
         <input type="text" name="searchQuery" class="form-control" placeholder="Arama yapın..." value="@ViewBag.SearchQuery" />
@@ -25,31 +34,33 @@
     </div>
 </form>
 
+<!--Sonuç mesajı-->
 @if (Model.Item1 != null && Model.Item1.Any())
 {
     <div id="searchResultMessage" class="alert alert-info" style="display: none;">
-        @Model.Item1.Count sonuç bulundu.
+        @Model.Item1.Count results found.
     </div>
 }
 else
 {
-    <div class="alert alert-warning">Hiçbir görev bulunamadı.</div>
+    <div class="alert alert-warning">Task Not Found.</div>
 }
 
+<!--Tablo-->
 @if (Model.Item1 != null && Model.Item1.Any())
 {
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>IP Adresi</th>
-                    <th>Görev Adı</th>
-                    <th>Durum</th>
-                    <th>Tetikleyici</th>
-                    <th>Son Çalıştırma Zamanı</th>
-                    <th>Sonraki Çalıştırma Zamanı</th>
-                    <th>Sonuç</th>
-                    <th class="text-center">İşlemler</th>
+                    <th>IP</th>
+                    <th>Task Name</th>
+                    <th>Status</th>
+                    <th>Trigger</th>
+                    <th>Last Run Time</th>
+                    <th>Next Start Time</th>
+                    <th>Result</th>
+                    <th class="text-center">Operations</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,8 +94,9 @@ else
             </tbody>
         </table>
 
+        <!-- Pagination -->
         <nav aria-label="Sayfalama">
-            <ul class="pagination">
+            <ul class="pagination justify-content-center">
                 @for (int i = 1; i <= Model.Item3; i++)
                 {
                     <li class="page-item @(i == Model.Item2 ? "active" : "")">
@@ -98,7 +110,23 @@ else
 
 @section Scripts {
     <script>
+        function showSpinner() {
+            document.getElementById('fullPageSpinner').style.display = 'flex';
+        }
+
+        function hideSpinner() {
+            document.getElementById('fullPageSpinner').style.display = 'none';
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
+            // Spinner gösterme: üst butonlar
+            document.querySelectorAll(".top-action-buttons a").forEach(button => {
+                button.addEventListener("click", () => {
+                    showSpinner();
+                });
+            });
+
+            // Arama sonucu mesajı
             var resultMessage = document.getElementById('searchResultMessage');
             if (resultMessage) {
                 resultMessage.style.display = 'block';
@@ -108,10 +136,24 @@ else
                 }, 3000);
             }
 
+            // Temizle butonu
             document.getElementById("clearSearch").addEventListener("click", function () {
+                showSpinner();
                 document.querySelector("input[name='searchQuery']").value = '';
                 window.location.href = '@Url.Action("GetTasks", "Task")';
             });
+
+            // Arama formuna spinner ekleme - submit öncesi göster, 150 ms sonra gönder
+            var searchForm = document.querySelector("form[asp-action='GetTasks']");
+            if (searchForm) {
+                searchForm.addEventListener("submit", function (e) {
+                    e.preventDefault(); // normal gönderimi engelle
+                    showSpinner();      // spinner göster
+                    setTimeout(() => {
+                        searchForm.submit(); // 150ms sonra formu manuel gönder
+                    }, 150);
+                });
+            }
         });
 
         function generateRowId(taskName, ipAddress) {
@@ -119,6 +161,7 @@ else
         }
 
         function changeTaskStatus(taskName, ipAddress, status) {
+            showSpinner();
             let confirmation = confirm(`Görev "${taskName}" (${ipAddress}) durumunu "${status}" yapmak istiyor musunuz?`);
             if (!confirmation) return;
 
@@ -137,7 +180,7 @@ else
                         let taskRow = $("#" + rowId);
                         let statusCell = taskRow.find(".task-status");
                         statusCell.text(status.charAt(0).toUpperCase() + status.slice(1));
-                        location.reload(); // Yenileme
+                        location.reload(); // yenileme
                     } else {
                         alert("Hata: " + response.message);
                     }
@@ -146,11 +189,26 @@ else
                     alert("Bir hata oluştu.");
                 }
             });
+
+            setTimeout(hideSpinner, 3000);
         }
     </script>
 }
 
 <style>
+    .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
     .top-action-buttons {
         position: absolute;
         top: 10px;
@@ -161,37 +219,43 @@ else
         flex-wrap: wrap;
     }
 
-        .top-action-buttons .btn-custom-action {
-            width: 150px;
-            text-align: center;
-        }
-
-    .icon-toggle-btn {
-        background-color: #dc3545;
-        color: #fff;
-        border: 1px solid #dc3545;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-left: 5px;
-        border-radius: 5px;
-        transition: all 0.3s ease;
+    .top-action-buttons .btn-custom-action {
+        width: 150px;
+        text-align: center;
     }
-
-        .icon-toggle-btn:hover {
-            background-color: #fff;
-            color: #dc3545;
-            border: 1px solid #dc3545;
-        }
-
-        .icon-toggle-btn i {
-            font-size: 18px;
-        }
 
     .input-group {
         margin-bottom: 20px;
+    }
+
+    .input-group .btn-success,
+    .input-group .icon-toggle-btn {
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 1.2rem;
+    }
+
+    .input-group .icon-toggle-btn {
+        background-color: #dc3545;
+        color: #fff;
+        border: 1px solid #dc3545;
+        margin-left: 10px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .input-group .icon-toggle-btn:hover {
+        background-color: #fff;
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
+    .input-group .icon-toggle-btn i {
+        font-size: 18px;
     }
 
     td.text-center button {
@@ -207,7 +271,6 @@ else
             opacity: 0;
             transform: translateY(-10px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);

@@ -18,30 +18,31 @@ namespace ServerApps.WebAPI.Controllers
         }
 
         [HttpGet("GetEventLogs")]
-        public ActionResult<List<EventLogEntryDto>> GetEventLogs([FromQuery] string serverIp, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TimeSpan? startTime, [FromQuery] TimeSpan? endTime)
+        public ActionResult<List<EventLogEntryDto>> GetEventLogs(
+    [FromQuery] string serverIp,
+    [FromQuery] DateTime? startDateTime,
+    [FromQuery] DateTime? endDateTime)
         {
             try
             {
                 if (string.IsNullOrEmpty(serverIp))
-                {
                     return BadRequest("Server IP is required.");
-                }
 
-                // Default olarak bugünün tarihi verilecek
-                if (!startDate.HasValue)
-                    startDate = DateTime.Today;
+                // Varsayılan olarak bugünün tarihini kullan
+                if (!startDateTime.HasValue)
+                    startDateTime = DateTime.Today;
 
-                if (!endDate.HasValue)
-                    endDate = DateTime.Today;
+                if (!endDateTime.HasValue)
+                    endDateTime = DateTime.Today.AddDays(1).AddSeconds(-1); // Bugünün sonu
 
-                var logs = _eventService.GetEventLogs(serverIp, startDate, endDate, startTime, endTime);
-
-                return Ok(logs); // Event logs döndürülür
+                var logs = _eventService.GetEventLogs(serverIp, startDateTime, endDateTime);
+                return Ok(logs);
             }
             catch (Exception ex)
             {
                 return BadRequest($"Error: {ex.Message}");
             }
         }
+
     }
 }

@@ -8,11 +8,11 @@ namespace ServerApps.Business.Dtos.EventDtos
 {
     public class EventLogEntryDto
     {
-        public DateTime? TimeCreated { get; set; }         // Date and Time
-        public string Level { get; set; }                  // Level
-        public string Source { get; set; }                 // Source
-        public string Id { get; set; }                     // Event ID
-        public string TaskCategory { get; set; }           // Task Category
+        public DateTime? TimeCreated { get; set; }       
+        public string Level { get; set; }                 
+        public string Source { get; set; }               
+        public string Id { get; set; }                  
+        public string TaskCategory { get; set; }        
         public string Message { get; set; }
     }
 }

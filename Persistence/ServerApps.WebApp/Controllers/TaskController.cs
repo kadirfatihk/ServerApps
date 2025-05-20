@@ -18,7 +18,7 @@ namespace ServerApps.WebApp.Controllers
 
         public IActionResult GetTasks(string searchQuery, int page = 1)
         {
-            int pageSize = 15;
+            int pageSize = 20;
 
             List<TaskInfoApplicationDto> allTasks = _taskService.GetAllTasks();
 

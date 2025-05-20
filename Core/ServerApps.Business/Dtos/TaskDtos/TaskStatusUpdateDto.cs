@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerApps.Business.Dtos.IisDtos
+namespace ServerApps.Business.Dtos.TaskDtos
 {
     public class TaskStatusUpdateDto
     {

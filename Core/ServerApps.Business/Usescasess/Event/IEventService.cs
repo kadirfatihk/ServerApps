@@ -9,6 +9,6 @@ namespace ServerApps.Business.Usescasess.Event
 {
     public interface IEventService
     {
-        List<EventLogEntryDto> GetEventLogs(string serverIp, DateTime? startDate = null, DateTime? endDate = null, TimeSpan? startTime = null, TimeSpan? endTime = null);
+        List<EventLogEntryDto> GetEventLogs(string serverIp, DateTime? startDateTime = null, DateTime? endDateTime = null);
     }
 }

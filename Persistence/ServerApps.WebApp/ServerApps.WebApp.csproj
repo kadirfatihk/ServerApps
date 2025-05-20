@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\Core\ServerApps.Business\ServerApps.Business.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
 </Project>

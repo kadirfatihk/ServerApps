@@ -1,0 +1,7 @@
+*** EVENT VIEWER ***
+
+-- ýp adresi appsettings.json'dan otomatik cekilecek GetEvents.cshtml'de
+-- appsettingse girilen her ip adresine ait olaylar listelenecek... hem GetEvent.cshtml'de hem de GetListEvent.cshtml'de
+-- listele butonuna basildiði zaman yeni bir view sayfasi acilacak... 
+	- GetListEvent.cshtml adinda, bu sayfada o ýp'li sunucunun olaylari tablo olarak listelenecek... tasarim temasi GetWebSites.cshtml ve GetTasks.cshtml ile ayni olacak.
+	- Level, Source, EventId, Message, TaskCategory, TimeCreated sutunlari olacak ve altlarinda EventViewer'daki bilgiler canli olarak gosterilecek...

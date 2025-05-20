@@ -166,9 +166,12 @@ public class IisService : IIisService
         var config = configurations.FirstOrDefault(c => c.Ip == ip);
 
         if (config is null)
-            throw new Exception("Sunucu yapılandırması bullunamadı.");
+            throw new Exception("Sunucu yapılandırması bulunamadı.");
+
+        string safeSiteName = siteName.Replace("'", "''");
 
         if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+        {
             using (var manager = new ServerManager())
             {
                 var site = manager.Sites.FirstOrDefault(s => s.Name == siteName);
@@ -178,12 +181,13 @@ public class IisService : IIisService
                 else
                     throw new Exception($"Site '{siteName}' bulunamadı.");
             }
+        }
         else
         {
             ExecutePowerShellCommand(ip, $@"
-            Import-Module WebAdministration
-            Start-Website -Name '{siteName}'
-        ");
+Import-Module WebAdministration
+Start-Website -Name '{safeSiteName}'
+");
         }
     }
 
@@ -195,7 +199,10 @@ public class IisService : IIisService
         if (config is null)
             throw new Exception("Sunucu yapılandırması bulunamadı.");
 
+        string safeSiteName = siteName.Replace("'", "''");
+
         if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+        {
             using (var manager = new ServerManager())
             {
                 var site = manager.Sites.FirstOrDefault(s => s.Name == siteName);
@@ -205,12 +212,13 @@ public class IisService : IIisService
                 else
                     throw new Exception($"Site '{siteName}' bulunamadı.");
             }
+        }
         else
         {
             ExecutePowerShellCommand(ip, $@"
-            Import-Module WebAdministration
-            Stop-Website -Name '{siteName}'
-        ");
+Import-Module WebAdministration
+Stop-Website -Name '{safeSiteName}'
+");
         }
     }
 
@@ -221,13 +229,15 @@ public class IisService : IIisService
         if (config is null)
             throw new Exception("Sunucu bulunamadı.");
 
-        if(ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
+        string safeSiteName = siteName.Replace("'", "''");
+
+        if (ip == "127.0.0.1" || ip.ToLower().Contains("localhost"))
         {
             using var manager = new ServerManager();
 
-            var site = manager.Sites.FirstOrDefault(s=>s.Name == siteName);
+            var site = manager.Sites.FirstOrDefault(s => s.Name == siteName);
 
-            if(site is null)
+            if (site is null)
                 throw new Exception("Site bulunamadı.");
 
             var binding = site.Bindings.FirstOrDefault();
@@ -239,48 +249,65 @@ public class IisService : IIisService
         }
         else
         {
-            // PowerShell üzerinden uzak bağlantı
             string psScript = $@"
-            Import-Module WebAdministration
-            $site = Get-Website -Name '{siteName}'
-            if ($site -eq $null) {{ throw 'Site bulunamadı.' }}
-            $binding = Get-WebBinding -Name '{siteName}' | Select-Object -First 1
-            if ($binding -ne $null) {{
-                Remove-WebBinding -Name '{siteName}' -BindingInformation $binding.bindingInformation -Protocol $binding.protocol
-                New-WebBinding -Name '{siteName}' -Protocol 'http' -Port {newPort} -IPAddress '*'
-            }}";
+Import-Module WebAdministration
+$site = Get-Website -Name '{safeSiteName}'
+if ($site -eq $null) {{ throw 'Site bulunamadı.' }}
+$binding = Get-WebBinding -Name '{safeSiteName}' | Select-Object -First 1
+if ($binding -ne $null) {{
+    Remove-WebBinding -Name '{safeSiteName}' -BindingInformation $binding.bindingInformation -Protocol $binding.protocol
+    New-WebBinding -Name '{safeSiteName}' -Protocol 'http' -Port {newPort} -IPAddress '*'
+}}";
 
             ExecutePowerShellCommand(ip, psScript);
         }
     }
 
+
+    //Bu metot, verilen IP adresindeki uzak bir Windows sunucusunda PowerShell komutu çalıştırmak için kullanılır.
     private void ExecutePowerShellCommand(string ip, string script)
     {
+        // Konfigürasyonları al
         var configuration = _configurationService.GetConfigurations();
+
+        // İlgili IP adresine sahip sunucu yapılandırmasını bul
         var config = configuration.FirstOrDefault(c => c.Ip == ip);
 
-         if (config is null)
+        // Yapılandırma bulunamazsa hata fırlat
+        if (config is null)
             throw new Exception("Sunucu yapılandırması bulunamadı.");
 
+        // Şifreyi güvenli hale getirmek için SecureString'e dönüştür
         var securePwd = new System.Security.SecureString();
         foreach (char c in config.Password)
-            securePwd.AppendChar(c);
-        securePwd.MakeReadOnly();
+            securePwd.AppendChar(c); // Her karakteri ekle
+        securePwd.MakeReadOnly(); // SecureString artık değiştirilemez
 
+        // Kullanıcı adı ve güvenli şifreyle PowerShell için kimlik bilgisi oluştur
         var credential = new PSCredential(config.Username, securePwd);
 
-        var connectionInfo = new WSManConnectionInfo(new Uri($"http://{config.Ip}:5985/wsman"),
-            "http://schemas.microsoft.com/powershell/Microsoft.PowerShell", credential);
+        // WSMan protokolü ile uzak bağlantı bilgisi oluştur
+        var connectionInfo = new WSManConnectionInfo(
+            new Uri($"http://{config.Ip}:5985/wsman"), // Uzak sunucunun WSMan URI'si
+            "http://schemas.microsoft.com/powershell/Microsoft.PowerShell", // PowerShell namespace
+            credential); // Kimlik bilgileri
 
+        // Varsayılan kimlik doğrulama mekanizmasını kullan
         connectionInfo.AuthenticationMechanism = AuthenticationMechanism.Default;
 
+        // PowerShell çalıştırma ortamı (runspace) oluştur ve aç
         using var runspace = RunspaceFactory.CreateRunspace(connectionInfo);
-        runspace.Open();
+        runspace.Open(); // Bağlantıyı aç
 
+        // PowerShell nesnesi oluştur
         using var ps = PowerShell.Create();
-        ps.Runspace = runspace;
+        ps.Runspace = runspace; // Oluşturulan runspace'i kullan
 
+        // Çalıştırılacak PowerShell betiğini ekle
         ps.AddScript(script);
+
+        // PowerShell komutunu çalıştır
         ps.Invoke();
     }
+
 }

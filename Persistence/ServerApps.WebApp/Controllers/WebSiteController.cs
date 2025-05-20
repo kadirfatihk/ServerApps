@@ -20,7 +20,7 @@ public class WebSiteController : Controller
     [HttpGet]
     public IActionResult GetWebSites(int page = 1, string searchQuery = "")
     {
-        int pageSize = 15;
+        int pageSize = 20;
 
         // IIS'den uygulamaları ve konfigürasyonları al
         var applications = _iisService.GetAllApplications();

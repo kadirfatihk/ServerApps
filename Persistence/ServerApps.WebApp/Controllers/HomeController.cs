@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 public class HomeController : Controller
 {
-    // Ana sayfa, sadece iki buton olacak
-    public IActionResult Index()
+    public IActionResult Index(string culture = "en")
     {
         return View();
     }
