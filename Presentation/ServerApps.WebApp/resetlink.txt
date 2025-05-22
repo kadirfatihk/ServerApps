@@ -1,0 +1,1 @@
+http://localhost:5243/Auth/ResetPassword?email=kadir.fatih96@gmail.com&token=dc4134b5-a77a-4da2-b572-c368f5fb3329

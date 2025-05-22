@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DVU-2025</title>
+    <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/dist/css/bootstrap.min.css")" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ServerApps.WebApp.styles.css" asp-append-version="true" />
+
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    DVU DANIŞMANLIK, YAZILIM VE AR-GE A.Ş.
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @* Menü elemanları buraya gelebilir *@
+                    </ul>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        bool isAdmin = User.Claims.Any(c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value == "Admin");
+                        string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                        string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+                        <ul class="navbar-nav">
+                            @if (isAdmin && currentController == "Home" && currentAction == "Index")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="UserManagement" asp-action="UserList">Kullanıcı Yönetimi</a>
+                                </li>
+                            }
+                        </ul>
+
+                        <ul class="navbar-nav ms-auto">
+                            @* Sağ tarafa yaslanması için *@
+                            <li class="nav-item">
+                                <form method="post" asp-controller="Auth" asp-action="Logout" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link p-0" title="Çıkış Yap" style="border: none; background: none;">
+                                        <i class="bi bi-box-arrow-right" style="font-size: 1.25rem; color: #000;"></i>
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Giriş Yap</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2025 - DVU DANIŞMANLIK, YAZILIM VE AR-GE A.Ş.
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
