@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServerApps.Persistence.Modal;
+using System;
 using System.Collections.Generic;
 
 namespace ServerApps.Persistence.Models;
@@ -24,4 +25,6 @@ public partial class User
     public DateTime? UpdateDate { get; set; }
 
     public bool IsActive { get; set; }
+
+    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 }

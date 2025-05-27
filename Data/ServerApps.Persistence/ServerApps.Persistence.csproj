@@ -18,8 +18,4 @@
     <ProjectReference Include="..\..\Core\ServerApps.Domain\ServerApps.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DbContext\" />
-  </ItemGroup>
-
 </Project>

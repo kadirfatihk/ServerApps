@@ -17,5 +17,8 @@ namespace ServerApps.Business.Usescasess.Auth
         void AddUser(User user);
         void DeleteUser(int userId);
         void UpdateUserAdminStatus(int userId, bool isAdmin);
+
+        bool SendResetPasswordEmail(string email, out string errorMessage);
+        bool ResetPassword(string email, string token, string newPassword, out string errorMessage);
     }
 }

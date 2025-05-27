@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DVU-2025</title>
+    <title>DVU DANIŞMANLIK, YAZILIM VE AR-GE A.Ş.</title>
     <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/dist/css/bootstrap.min.css")" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ServerApps.WebApp.styles.css" asp-append-version="true" />
@@ -15,7 +15,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand">
                     DVU DANIŞMANLIK, YAZILIM VE AR-GE A.Ş.
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -37,7 +37,7 @@
                             @if (isAdmin && currentController == "Home" && currentAction == "Index")
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="UserManagement" asp-action="UserList">Kullanıcı Yönetimi</a>
+                                    <a class="nav-link" asp-controller="UserManagement" asp-action="UserList">User Management</a>
                                 </li>
                             }
                         </ul>

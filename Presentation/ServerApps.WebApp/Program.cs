@@ -9,6 +9,7 @@ using ServerApps.Business.Usescasess.IIS;
 using ServerApps.Business.Usescasess.Task;
 using ServerApps.Business.Usescasess.TaskScheduler;
 using ServerApps.Persistence.Modal;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,9 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+
+builder.Services.AddMemoryCache(); // IMemoryCache için
+
 var cs = builder.Configuration.GetConnectionString("DvuDb");
 builder.Services.AddDbContext<DvuApplicationAuthenticationDbContext>(options => options.UseSqlServer(cs));
 
@@ -29,9 +33,9 @@ builder.Services.AddDbContext<DvuApplicationAuthenticationDbContext>(options => 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Auth/Login";    // AuthController Login metodu
-        options.LogoutPath = "/Auth/Logout";  // Ýstersen logout route ekle
-        options.AccessDeniedPath = "/Auth/AccessDenied"; // Ýstersen buraya da route ekle
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
     });
 
 var app = builder.Build();
@@ -48,7 +52,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Kimlik doðrulama ve yetkilendirme middleware’leri sýrasý önemli!
 app.UseAuthentication();
 app.UseAuthorization();
 

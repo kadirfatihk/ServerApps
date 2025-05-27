@@ -1,13 +1,13 @@
 ﻿@model List<ServerApps.Persistence.Models.User>
 
-<h2>Kullanıcılar</h2>
+<h2>Users</h2>
 
 <table class="table">
     <thead>
         <tr>
-            <th>E-posta</th>
+            <th>E-Mail</th>
             <th>Admin</th>
-            <th>İşlemler</th>
+            <th>Operations</th>
         </tr>
     </thead>
     <tbody>
@@ -25,7 +25,7 @@
                 <td>
                     <form method="post" asp-action="Delete" onsubmit="return confirm('Silmek istediğinize emin misiniz?');" style="display:inline;">
                         <input type="hidden" name="id" value="@user.Id" />
-                        <button type="submit" class="btn btn-danger">Sil</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </td>
             </tr>
@@ -33,4 +33,4 @@
     </tbody>
 </table>
 
-<a asp-action="AddUser" class="btn btn-success">Yeni Kullanıcı Ekle</a>
+<a asp-action="AddUser" class="btn btn-success">Add New User</a>

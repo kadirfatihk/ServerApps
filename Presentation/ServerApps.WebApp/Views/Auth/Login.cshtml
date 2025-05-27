@@ -6,7 +6,7 @@
 <html lang="tr">
 <head>
     <meta charset="utf-8" />
-    <title>Giriş Yap</title>
+    <title>DVU DANIŞMANLIK, YAZILIM VE AR-GE A.Ş.</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         body, html {
@@ -89,7 +89,7 @@
 </head>
 <body>
     <div class="login-container">
-        <h2>Giriş Yap</h2>
+        <h2>Login</h2>
 
         @if (ViewBag.Error != null)
         {
@@ -97,17 +97,17 @@
         }
 
         <form method="post" asp-controller="Auth" asp-action="Login">
-            <label for="email">E-posta</label>
+            <label for="email">E-Mail</label>
             <input type="email" id="email" name="email" required autofocus />
 
-            <label for="password">Şifre</label>
+            <label for="password">Password</label>
             <input type="password" id="password" name="password" required />
 
-            <button type="submit">Giriş Yap</button>
+            <button type="submit">Login</button>
         </form>
 
         <div class="forgot-password">
-            <a asp-controller="Auth" asp-action="ForgotPassword">Şifremi unuttum?</a>
+            <a asp-controller="Auth" asp-action="ForgotPassword">Forgot password?</a>
         </div>
     </div>
 </body>
