@@ -68,14 +68,18 @@ Proje, katmanlı mimari kullanılarak geliştirilmiştir:
 
 ## Kurulum ve Kullanım
 
-### 1. Uzak Sunucu Bağlantısı
+### 1. Uzak Sunucu ve Veritabanı Bağlantısı
 
 `appsettings.json` dosyasına bağlanmak istediğiniz sunucu bilgilerini ekleyin. Örnek yapı:
 
 ```json
 {
+  "ConnectionStrings": {
+    "DvuDb": "Server=Sunucu_Adresi; DatabaseVeritabanı_Adı; User Id=Kullanıcı_Adı; Password=Şifre; TrustServerCertificate=True;"
+  },
   "Applications": {
-    "64 Sunucusu": [ "uzak_sunucu_ip", "username", "password" ]
+
+    "64": [ "IP_Adresi", "Kullanıcı_Adı", "Şifre" ]
   },
   "Logging": {
     "LogLevel": {
@@ -85,3 +89,13 @@ Proje, katmanlı mimari kullanılarak geliştirilmiştir:
   },
   "AllowedHosts": "*"
 }
+```
+
+### 2. Projeyi Çalıştırma
+
+- Projeyi .NET 8 ortamında derleyip çalıştırabilirsiniz.
+- UI üzerinden kullanıcı girişi yaparak sunuculardaki IIS, Task Scheduler ve Event Viewer verilerine erişebilir ve filtreleyebilirsiniz.
+- Admin yetkisi olan kullanıcılar kullanıcı yönetim paneline erişebilir.
+- Şifremi unuttum özelliği aktif olup, kullanıcılar e-posta üzerinden şifre sıfırlama işlemi yapabilir.
+
+
