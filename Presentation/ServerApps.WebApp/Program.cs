@@ -23,7 +23,6 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-
 builder.Services.AddMemoryCache(); // IMemoryCache için
 
 var cs = builder.Configuration.GetConnectionString("DvuDb");
@@ -39,6 +38,24 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 var app = builder.Build();
+
+// Uygulama baþlarken kullanýcý yoksa varsayýlan admini oluþtur
+using (var scope = app.Services.CreateScope())
+{
+    var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+    if (!userService.HasAnyUser())
+    {
+        userService.CreateUser(
+            email: "admin@dvu.com.tr",
+            plainPassword: "admin",
+            firstName: "admin",
+            lastName: "dmin",
+            jobTitle: "admin",
+            isAdmin: true
+        );
+    }
+}
 
 // Pipeline konfigürasyonu
 if (!app.Environment.IsDevelopment())

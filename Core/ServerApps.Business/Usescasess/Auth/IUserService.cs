@@ -20,5 +20,8 @@ namespace ServerApps.Business.Usescasess.Auth
 
         bool SendResetPasswordEmail(string email, out string errorMessage);
         bool ResetPassword(string email, string token, string newPassword, out string errorMessage);
+
+        bool HasAnyUser();
+        void CreateUser(string email, string plainPassword, string firstName = null, string lastName=null, string jobTitle = null, bool isAdmin = false);
     }
 }
