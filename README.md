@@ -1,14 +1,33 @@
 # ServerApps
 
-Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini ve görev zamanlayıcısındaki (Task Scheduler) görevleri listeleyen bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
+Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini ve görev zamanlayıcısındaki (Task Scheduler) görevleri ve Event Viewer'daki olayları listeleyen bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
 
 ## Amaç
 
 Proje, aşağıdaki işlemleri gerçekleştirir:
 
-- `appsettings.json` dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
-- Uzak sunucudaki IIS üzerindeki web sitelerini listeler.
-- Uzak sunucudaki görev zamanlayıcısından (Task Scheduler) görevleri listeler.
+- appsettings.json dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
+- Uzak sunucudaki IIS üzerindeki web sitelerini listeler ve gelişmiş filtreleme yapabilir.
+- Uzak sunucudaki görev zamanlayıcısından (Task Scheduler) görevleri listeler, durumu değiştirir ve gelişmiş filtreleme sağlar.
+- Event Viewer'daki olayları listeler ve gelişmiş filtreleme yapar.
+- Kullanıcı girişi ile kimlik doğrulama sağlar.
+- Yönetici (admin) yetkisine sahip kullanıcıların kullanıcı yönetimi yapabilmesini sağlar.
+- Kullanıcı şifrelerini veritabanında güvenli şekilde şifreler.
+- Şifremi unuttum özelliği ile kullanıcıların e-posta adreslerine doğrulama maili gönderir ve token tabanlı şifre sıfırlama ekranı sunar.
+
+## Özellikler
+- Kullanıcı Girişi ve Yetkilendirme: Kullanıcılar güvenli şekilde sisteme giriş yapabilir.
+- Şifreleme: Kullanıcı şifreleri veritabanında güvenli olarak şifrelenir.
+- Şifremi Unuttum: Kullanıcılar, e-posta adreslerine gönderilen doğrulama maili üzerinden token kullanarak şifrelerini sıfırlayabilir.
+- Admin Yetkisi: Yönetici kullanıcılar, diğer kullanıcıları yönetebilir (ekleme, silme, yetkilendirme).
+-Gelişmiş Filtreleme:
+* IIS Web Siteleri için filtreleme seçenekleri.
+* Görev Zamanlayıcısı (Task Scheduler) görevleri için gelişmiş filtreleme ve durum değiştirme.
+* Event Viewer olayları için gelişmiş filtreleme.
+- Güvenli Uzak Bağlantı: Uzak sunuculara güvenli PowerShell bağlantısı ile erişim.
+- API ve MVC UI: Hem RESTful API hem de kullanıcı dostu MVC tabanlı arayüz.
+
+
 
 ## Teknolojiler
 
@@ -21,6 +40,8 @@ Proje, aşağıdaki işlemleri gerçekleştirir:
 - Cake.Powershell (Business katmanı)
 - Swashbuckle.AspNetCore (WebAPI katmanı)
 - TaskScheduler (Görev Zamanlayıcı)
+- Kimlik Doğrulama ve Yetkilendirme (Authentication & Authorization)
+- Şifreleme ve Token Tabanlı Şifre Sıfırlama
 
 ## Yapı
 
