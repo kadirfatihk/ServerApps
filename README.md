@@ -1,77 +1,85 @@
 # ServerApps
 
----
-
-## 📌 Proje Açıklaması
-ServerApps, `appsettings.json` dosyasına tanımlanan uzak veya yerel sunuculara bağlanarak, IIS üzerindeki web sitelerini ve Görev Zamanlayıcı (Task Scheduler) görevlerini dinamik olarak listeleyen bir .NET 8 uygulamasıdır. Hem Web API hem de MVC tabanlı kullanıcı arayüzü ile geliştirilmiştir.
+Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini, görev zamanlayıcısındaki (Task Scheduler) görevleri ve Event Viewer'daki olayları listeleyen ve yöneten bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
 
 ---
 
-## 🎯 Amaç
-- 🔗 **Uzak Sunucu Bağlantıları**: `appsettings.json` üzerinden alınan bağlantı bilgileri ile uzak sunuculara erişim sağlanır.
-- 🌐 **IIS Web Siteleri Listeleme**: Her sunucudaki IIS web siteleri dinamik olarak listelenir.
-- 🕒 **Görev Zamanlayıcısı (Task Scheduler) Görevleri**: Web sitelerine ait görev zamanlayıcısındaki görevler listelenir.
-- 🎨 **Kullanıcı Dostu Arayüz**: Veriler görsel olarak kullanıcı dostu bir şekilde sunulur.
+## Amaç
+
+Proje, aşağıdaki işlemleri gerçekleştirir:
+
+- `appsettings.json` dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
+- Uzak sunucudaki IIS üzerindeki web sitelerini listeler ve gelişmiş filtreleme yapabilir.
+- Uzak sunucudaki görev zamanlayıcısından (Task Scheduler) görevleri listeler, durumu değiştirir ve gelişmiş filtreleme sağlar.
+- Event Viewer'daki olayları listeler ve gelişmiş filtreleme yapar.
+- Kullanıcı girişi ile kimlik doğrulama sağlar.
+- Yönetici (admin) yetkisine sahip kullanıcıların kullanıcı yönetimi yapabilmesini sağlar.
+- Kullanıcı şifrelerini veritabanında güvenli şekilde şifreler.
+- Şifremi unuttum özelliği ile kullanıcıların e-posta adreslerine doğrulama maili gönderir ve token tabanlı şifre sıfırlama ekranı sunar.
 
 ---
 
-## 🔍 Arama Özelliği
-- Kullanıcılar, IP adresi, port numarası, uygulama adı, görev durumu (Ready, Running, vb.) gibi kriterlere göre arama yapabilirler.
-- Arama, kullanıcıya hızlı bir şekilde ilgili sunucu ve görevleri bulma imkanı sunar.
-- Esnek Arama: Arama sırasında, yalnızca IP, port, uygulama adı gibi doğrudan bilgilere değil, görev durumlarına veya görev adı içeriğine göre de sonuçlar dönebilir. Örneğin:
-   Bu özellik hem IIS üzerindeki web siteleri hem de Görev Zamanlayıcısı görevleri için geçerlidir.
+## Teknolojiler
 
----
-## 🛠️ Kullanılan Teknolojiler
-
-### Backend Teknolojileri 🔧
-- **.NET 8**
-- **Entity Framework Core**
-- **PowerShell**
-
-### Frontend Teknolojileri 🎨
-- **MVC**
-- **Bootstrap**
+- .NET 8
+- PowerShell (uzak sunucuya bağlanmak için)
+- MVC (UI tarafı)
+- Bootstrap (UI tasarımı)
+- CSS & JS (UI geliştirme)
+- Entity Framework Core (Domain katmanı)
+- Cake.Powershell (Business katmanı)
+- Swashbuckle.AspNetCore (WebAPI katmanı)
+- TaskScheduler (Görev Zamanlayıcı)
+- Kimlik Doğrulama ve Yetkilendirme (Authentication & Authorization)
+- Şifreleme ve Token Tabanlı Şifre Sıfırlama
 
 ---
 
-## 💻 Kullanılan Diller
+## Mimari Yapı
 
-- **C#**
-- **CSS**
-- **JavaScript**
+Proje, katmanlı mimari kullanılarak geliştirilmiştir:
 
----
+- **Core**: Business ve Domain katmanları içerir.
+- **Persistence**: WebAPI ve WebMVC içerir.
 
-## 📚 Kullanılan Kütüphaneler
-- `Cake.Powershell`
-- `Microsoft.Extensions.Configuration.Binding`
-- `Microsoft.Extensions.Hosting`
-- `Microsoft.EntityFrameworkCore`
-- `Microsoft.EntityFrameworkCore.Design`
-- `Microsoft.EntityFrameworkCore.Tools`
-- `TaskScheduler`
+### Kullanılan Kütüphaneler
+
+- **Business Katmanı**: Cake.Powershell, Microsoft.Extensions.Configuration.Binding, Microsoft.Extensions.Hosting, TaskScheduler
+- **Domain Katmanı**: Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools
+- **WebAPI Katmanı**: TaskScheduler, Swashbuckle.AspNetCore
+- **WebApp Katmanı**: TaskScheduler
 
 ---
 
-## 🧱 Proje Mimarisi
-Proje, **katmanlı mimari** yapısına sahiptir:
+## Özellikler ve Yenilikler
 
-- **Core**: İş mantığını ve veri modellerini barındırır.
-- **Persistence**: IIS ve Task Scheduler gibi kaynaklardan veri çekme işlemlerini gerçekleştirir.
-- **WebAPI**: Sunucu bilgilerini işleyerek gerekli verileri API olarak sunar.
-- **WebApp (MVC)**: Bootstrap destekli kullanıcı arayüzü ile verileri kullanıcıya sunar.
+- **Kullanıcı Girişi ve Yetkilendirme**: Kullanıcılar güvenli şekilde sisteme giriş yapabilir.
+- **Şifreleme**: Kullanıcı şifreleri veritabanında güvenli olarak şifrelenir.
+- **Şifremi Unuttum**: Kullanıcılar, e-posta adreslerine gönderilen doğrulama maili üzerinden token kullanarak şifrelerini sıfırlayabilir.
+- **Admin Yetkisi**: Yönetici kullanıcılar, diğer kullanıcıları yönetebilir (ekleme, silme, yetkilendirme).
+- **Gelişmiş Filtreleme**:
+  - IIS Web Siteleri için filtreleme seçenekleri.
+  - Görev Zamanlayıcısı (Task Scheduler) görevleri için gelişmiş filtreleme ve durum değiştirme.
+  - Event Viewer olayları için gelişmiş filtreleme.
+- **Güvenli Uzak Bağlantı**: Uzak sunuculara güvenli PowerShell bağlantısı ile erişim.
+- **API ve MVC UI**: Hem RESTful API hem de kullanıcı dostu MVC tabanlı arayüz.
 
 ---
 
-## ⚙️ Kurulum ve Kullanım
+## Kurulum ve Kullanım
 
-### 1. Uzak Sunucu Bilgilerini Tanımlayın
-`appsettings.json` dosyasını aşağıdaki gibi yapılandırın:
-```
+### 1. Uzak Sunucu ve Veritabanı Bağlantısı
+
+`appsettings.json` dosyasına bağlanmak istediğiniz sunucu bilgilerini ekleyin. Örnek yapı:
+
+```json
 {
+  "ConnectionStrings": {
+    "DvuDb": "Server=Sunucu_Adresi; DatabaseVeritabanı_Adı; User Id=Kullanıcı_Adı; Password=Şifre; TrustServerCertificate=True;"
+  },
   "Applications": {
-    "SUNUCU_ADI": [ "IP", "KULLANICI_ADI", "ŞİFRE" ]
+
+    "64": [ "IP_Adresi", "Kullanıcı_Adı", "Şifre" ]
   },
   "Logging": {
     "LogLevel": {
@@ -82,36 +90,12 @@ Proje, **katmanlı mimari** yapısına sahiptir:
   "AllowedHosts": "*"
 }
 ```
-### 2. Gerekli Paketleri Yükleyin
-Proje bağımlılıklarını yüklemek için terminal üzerinden aşağıdaki komutu çalıştırın:
-dotnet restore
 
-### 3. Projeyi Yayınlayın
-Projeyi yayınlamak için aşağıdaki komutu kullanın:
-dotnet publish -c Release
+### 2. Projeyi Çalıştırma
 
-### 4. IIS Üzerinden Web Sitesi Olarak Yayınlayın
-- Yayınladığınız dosyaları uzak sunucuya kopyalayın.
-- IIS üzerinden yeni bir web sitesi oluşturun ve bu dizini seçin.
-- Web sitesini başlatın ve kontrol edin.
+- Projeyi .NET 8 ortamında derleyip çalıştırabilirsiniz.
+- UI üzerinden kullanıcı girişi yaparak sunuculardaki IIS, Task Scheduler ve Event Viewer verilerine erişebilir ve filtreleyebilirsiniz.
+- Admin yetkisi olan kullanıcılar kullanıcı yönetim paneline erişebilir.
+- Şifremi unuttum özelliği aktif olup, kullanıcılar e-posta üzerinden şifre sıfırlama işlemi yapabilir.
 
-### 5. Web Arayüzü Kullanımı
-- Web sitesine tarayıcı üzerinden erişin.
-- Ana sayfada sunucular listelenir.
-- İlgili sunucuya tıkladığınızda, o sunucudaki IIS web siteleri ve görev zamanlayıcı görevleri listelenir.
-- Tüm veriler canlı olarak sunuculardan çekilir, veritabanı kullanılmaz.
 
----
-
-## 🤝 Katkıda Bulunma
-- Bu projeyi fork edin.
-- Yeni bir branch oluşturun (feature/yeniozellik).
-- Değişikliklerinizi yapın ve commit edin.
-- Pull Request gönderin.
-
----
-
-## Proje Görselleri
-![Image](https://github.com/user-attachments/assets/97fe9631-f6ba-4b44-afde-27604fbc0abd)
-
-![Image](https://github.com/user-attachments/assets/3986ec39-2e6b-4a70-87e9-518ab3d044f6)
