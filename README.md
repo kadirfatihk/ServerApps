@@ -1,12 +1,14 @@
 # ServerApps
 
-Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini ve görev zamanlayıcısındaki (Task Scheduler) görevleri ve Event Viewer'daki olayları listeleyen bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
+Bu proje, `appsettings.json` dosyasına yazılan sunucu bilgilerini kullanarak, belirtilen sunuculardaki IIS web sitelerini, görev zamanlayıcısındaki (Task Scheduler) görevleri ve Event Viewer'daki olayları listeleyen ve yöneten bir araçtır. Hem API tarafı hem de MVC tabanlı UI tarafı geliştirilmiştir.
+
+---
 
 ## Amaç
 
 Proje, aşağıdaki işlemleri gerçekleştirir:
 
-- appsettings.json dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
+- `appsettings.json` dosyasındaki sunucu bilgileriyle uzak sunucuya bağlanır.
 - Uzak sunucudaki IIS üzerindeki web sitelerini listeler ve gelişmiş filtreleme yapabilir.
 - Uzak sunucudaki görev zamanlayıcısından (Task Scheduler) görevleri listeler, durumu değiştirir ve gelişmiş filtreleme sağlar.
 - Event Viewer'daki olayları listeler ve gelişmiş filtreleme yapar.
@@ -15,19 +17,7 @@ Proje, aşağıdaki işlemleri gerçekleştirir:
 - Kullanıcı şifrelerini veritabanında güvenli şekilde şifreler.
 - Şifremi unuttum özelliği ile kullanıcıların e-posta adreslerine doğrulama maili gönderir ve token tabanlı şifre sıfırlama ekranı sunar.
 
-## Özellikler
-- Kullanıcı Girişi ve Yetkilendirme: Kullanıcılar güvenli şekilde sisteme giriş yapabilir.
-- Şifreleme: Kullanıcı şifreleri veritabanında güvenli olarak şifrelenir.
-- Şifremi Unuttum: Kullanıcılar, e-posta adreslerine gönderilen doğrulama maili üzerinden token kullanarak şifrelerini sıfırlayabilir.
-- Admin Yetkisi: Yönetici kullanıcılar, diğer kullanıcıları yönetebilir (ekleme, silme, yetkilendirme).
--Gelişmiş Filtreleme:
-* IIS Web Siteleri için filtreleme seçenekleri.
-* Görev Zamanlayıcısı (Task Scheduler) görevleri için gelişmiş filtreleme ve durum değiştirme.
-* Event Viewer olayları için gelişmiş filtreleme.
-- Güvenli Uzak Bağlantı: Uzak sunuculara güvenli PowerShell bağlantısı ile erişim.
-- API ve MVC UI: Hem RESTful API hem de kullanıcı dostu MVC tabanlı arayüz.
-
-
+---
 
 ## Teknolojiler
 
@@ -43,27 +33,49 @@ Proje, aşağıdaki işlemleri gerçekleştirir:
 - Kimlik Doğrulama ve Yetkilendirme (Authentication & Authorization)
 - Şifreleme ve Token Tabanlı Şifre Sıfırlama
 
-## Yapı
+---
+
+## Mimari Yapı
 
 Proje, katmanlı mimari kullanılarak geliştirilmiştir:
+
 - **Core**: Business ve Domain katmanları içerir.
 - **Persistence**: WebAPI ve WebMVC içerir.
 
-### Kullanılan Kütüphaneler:
+### Kullanılan Kütüphaneler
+
 - **Business Katmanı**: Cake.Powershell, Microsoft.Extensions.Configuration.Binding, Microsoft.Extensions.Hosting, TaskScheduler
 - **Domain Katmanı**: Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools
 - **WebAPI Katmanı**: TaskScheduler, Swashbuckle.AspNetCore
 - **WebApp Katmanı**: TaskScheduler
 
-## Kurulum
+---
+
+## Özellikler ve Yenilikler
+
+- **Kullanıcı Girişi ve Yetkilendirme**: Kullanıcılar güvenli şekilde sisteme giriş yapabilir.
+- **Şifreleme**: Kullanıcı şifreleri veritabanında güvenli olarak şifrelenir.
+- **Şifremi Unuttum**: Kullanıcılar, e-posta adreslerine gönderilen doğrulama maili üzerinden token kullanarak şifrelerini sıfırlayabilir.
+- **Admin Yetkisi**: Yönetici kullanıcılar, diğer kullanıcıları yönetebilir (ekleme, silme, yetkilendirme).
+- **Gelişmiş Filtreleme**:
+  - IIS Web Siteleri için filtreleme seçenekleri.
+  - Görev Zamanlayıcısı (Task Scheduler) görevleri için gelişmiş filtreleme ve durum değiştirme.
+  - Event Viewer olayları için gelişmiş filtreleme.
+- **Güvenli Uzak Bağlantı**: Uzak sunuculara güvenli PowerShell bağlantısı ile erişim.
+- **API ve MVC UI**: Hem RESTful API hem de kullanıcı dostu MVC tabanlı arayüz.
+
+---
+
+## Kurulum ve Kullanım
 
 ### 1. Uzak Sunucu Bağlantısı
-`appsettings.json` dosyasına sunucu bilgilerini ekleyin. Örneğin:
+
+`appsettings.json` dosyasına bağlanmak istediğiniz sunucu bilgilerini ekleyin. Örnek yapı:
 
 ```json
 {
   "Applications": {
-    "64 Sunucusu": [ "uzak sunucu ıp", "username", "password" ]
+    "64 Sunucusu": [ "uzak_sunucu_ip", "username", "password" ]
   },
   "Logging": {
     "LogLevel": {
