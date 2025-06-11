@@ -23,12 +23,12 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddMemoryCache(); // IMemoryCache için
+builder.Services.AddMemoryCache(); // IMemoryCache iÃ§in
 
-var cs = builder.Configuration.GetConnectionString("DvuDb");
+var cs = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<DvuApplicationAuthenticationDbContext>(options => options.UseSqlServer(cs));
 
-// Cookie Authentication yapýlandýrmasý
+// Cookie Authentication yapÃ½landÃ½rmasÃ½
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -39,7 +39,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-// Uygulama baþlarken kullanýcý yoksa varsayýlan admini oluþtur
 using (var scope = app.Services.CreateScope())
 {
     var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
@@ -47,17 +46,17 @@ using (var scope = app.Services.CreateScope())
     if (!userService.HasAnyUser())
     {
         userService.CreateUser(
-            email: "admin@dvu.com.tr",
-            plainPassword: "admin",
-            firstName: "admin",
-            lastName: "dmin",
+            email: "user@example.com",
+            plainPassword: "user111",
+            firstName: "user",
+            lastName: "user",
             jobTitle: "admin",
             isAdmin: true
         );
     }
 }
 
-// Pipeline konfigürasyonu
+// Pipeline konfigÃ¼rasyonu
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
